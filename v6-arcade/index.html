@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Matej Popovski · Arcade</title>
+  <meta name="description" content="Matej Popovski, software and machine learning engineer: a playable pixel arcade. Walk a little robot between cabinets to explore projects in computer vision, robotics, reinforcement learning and games." />
+  <meta name="theme-color" content="#07040f" />
+  <meta property="og:title" content="Matej Popovski · Arcade" />
+  <meta property="og:description" content="A playable pixel arcade portfolio. Every cabinet is a project." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' rx='2' fill='%23120a24'/%3E%3Crect x='7' y='1' width='2' height='2' fill='%23ff3d8b'/%3E%3Crect x='7' y='3' width='2' height='1' fill='%23e9ecf5'/%3E%3Crect x='2' y='4' width='12' height='8' fill='%23e9ecf5'/%3E%3Crect x='3' y='5' width='10' height='5' fill='%23140c26'/%3E%3Crect x='5' y='6' width='2' height='2' fill='%2336f9f6'/%3E%3Crect x='9' y='6' width='2' height='2' fill='%2336f9f6'/%3E%3Crect x='3' y='12' width='10' height='3' fill='%233a7bff'/%3E%3Crect x='7' y='12' width='2' height='1' fill='%23ffd23f'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/arcade.css" />
+</head>
+<body>
+  <a class="skip-link" id="skipLink" href="#textv">Skip the game: browse everything as a plain page</a>
+
+  <main id="app">
+    <h1 class="sr-only" id="srName">Matej Popovski</h1>
+    <canvas id="game" role="img" aria-label="A pixel-art arcade hall. A small robot walks between arcade cabinets, one per project. Use the menu or the plain page to browse everything without playing."></canvas>
+    <div class="crt" aria-hidden="true"></div>
+
+    <!-- HUD -->
+    <header class="hud" id="hud" hidden>
+      <div class="hud-l">
+        <p class="hud-coins" id="hudCoins"><span class="coin-i" aria-hidden="true"></span><span id="coinCount">00</span><span class="hud-dim">/<span id="coinTotal">00</span></span><span class="sr-only"> coins collected</span></p>
+        <p class="hud-zone" id="hudZone" aria-live="polite">LOBBY</p>
+      </div>
+      <nav class="hud-r" aria-label="Game controls">
+        <button class="hud-btn" id="btnSound" type="button" aria-pressed="false"><span class="ico" aria-hidden="true">♪</span><span class="lbl">SOUND OFF</span></button>
+        <button class="hud-btn" id="btnItems" type="button" aria-label="Inventory (I)"><span class="ico" aria-hidden="true">◆</span><span class="lbl">ITEMS</span></button>
+        <button class="hud-btn hot" id="btnMenu" type="button" aria-haspopup="dialog" aria-label="Menu and quick travel (Esc)"><span class="ico" aria-hidden="true">☰</span><span class="lbl">MENU</span></button>
+      </nav>
+    </header>
+    <canvas id="minimap" width="42" height="28" aria-hidden="true" hidden></canvas>
+
+    <button class="prompt" id="prompt" type="button" hidden><kbd>E</kbd><span class="p-verb">VIEW</span><span class="p-what"></span></button>
+    <p class="keys" id="keys" hidden aria-hidden="true"><span><kbd>←↑↓→</kbd>/<kbd>WASD</kbd> move</span><span><kbd>E</kbd> use</span><span><kbd>I</kbd> items</span><span><kbd>M</kbd> sound</span><span><kbd>ESC</kbd> menu</span><span><kbd>⇧</kbd> run</span></p>
+
+    <!-- Title screen / attract mode -->
+    <section class="title" id="title" aria-labelledby="logo">
+      <div class="title-inner">
+        <p class="title-top" aria-hidden="true"><span>1UP</span><span class="blink-slow">INSERT COIN</span><span>2UP</span></p>
+        <h2 class="logo" id="logo"><span class="logo-1" id="logo1">MATEJ</span><span class="logo-2" id="logo2">POPOVSKI</span></h2>
+        <p class="title-sub" id="titleSub"></p>
+        <p class="title-role" id="titleRole"></p>
+        <button class="press" id="pressStart" type="button"><span class="blink">PRESS START</span></button>
+        <div class="scores" id="scores">
+          <h3 class="scores-h" id="boardTitle">HIGH SCORES</h3>
+          <ol class="board" id="board"></ol>
+          <div class="dots" id="boardDots"></div>
+        </div>
+        <div class="title-actions">
+          <button class="btn ghost sm" id="btnSkip" type="button">SKIP THE GAME · PLAIN PAGE</button>
+        </div>
+        <p class="title-foot" aria-hidden="true">© MP ARCADE · CREDIT 01</p>
+      </div>
+    </section>
+
+    <div class="banner" id="banner" aria-hidden="true"></div>
+  </main>
+
+  <!-- Touch controls (outside #app so they can sit above the Snake dialog) -->
+  <div class="touch" id="touch" aria-hidden="true">
+    <div class="dpad" id="dpad">
+      <span class="dp up"></span><span class="dp down"></span><span class="dp left"></span><span class="dp right"></span><span class="dp mid"></span>
+    </div>
+    <div class="ab">
+      <div class="abtn b" id="btnB"><span>B</span><small>ITEMS</small></div>
+      <div class="abtn a" id="btnA"><span>A</span><small>USE</small></div>
+    </div>
+  </div>
+
+
+  <!-- CRT dialog -->
+  <div class="overlay" id="overlay" hidden>
+    <div class="cab-modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="cab-screen">
+        <header class="m-head">
+          <p class="m-kicker" id="modalKicker"></p>
+          <h2 class="m-title" id="modalTitle"></h2>
+          <button class="m-close" id="modalClose" type="button" aria-label="Close (Esc)">✕</button>
+        </header>
+        <div class="m-body" id="modalBody"></div>
+      </div>
+      <p class="cab-brand" aria-hidden="true"><span>MP-2600</span><span class="led"></span></p>
+    </div>
+  </div>
+
+  <!-- RPG talk box -->
+  <div class="talk" id="talk" hidden role="dialog" aria-modal="true" aria-labelledby="talkName" aria-describedby="talkFull">
+    <div class="talk-portrait"><canvas id="talkPortrait" width="32" height="32" aria-hidden="true"></canvas></div>
+    <div class="talk-main">
+      <p class="talk-name" id="talkName"></p>
+      <p class="talk-text" id="talkText" aria-hidden="true"></p>
+      <p class="sr-only" id="talkFull"></p>
+    </div>
+    <button class="talk-next" id="talkNext" type="button"><span aria-hidden="true">▼</span><span class="sr-only">Next</span></button>
+  </div>
+
+  <!-- Everything, as a plain page -->
+  <section class="textv" id="textv" hidden tabindex="-1" aria-labelledby="textvTitle"></section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <noscript><p class="noscript">This arcade runs on JavaScript. Please enable it to play, or visit <a href="https://github.com/matejpopovski">github.com/matejpopovski</a>.</p></noscript>
+
+  <script src="../shared/data.js"></script>
+  <script src="assets/js/pixel.js"></script>
+  <script src="assets/js/audio.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/minigames.js"></script>
+  <script src="assets/js/game.js"></script>
+</body>
+</html>
