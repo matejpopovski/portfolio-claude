@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-wall="dunes">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>MatejOS · Matej Popovski, Software &amp; ML Engineer</title>
+  <meta name="description" content="Matej Popovski's portfolio as a tiny operating system. Boot it up, drag windows around, browse computer vision, robotics and reinforcement learning projects, play Snake, and send a mail." />
+  <meta name="theme-color" content="#f3ede2" />
+  <meta property="og:title" content="MatejOS · Matej Popovski" />
+  <meta property="og:description" content="A portfolio you can boot. Software &amp; machine learning engineer, MS CS (AI &amp; ML) at UW–Madison." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='8' width='54' height='52' rx='13' fill='%231c1b19'/%3E%3Crect x='2' y='4' width='54' height='52' rx='13' fill='%23ff5b37' stroke='%231c1b19' stroke-width='3'/%3E%3Cpath d='M15 42V18l14 14 14-14v24' fill='none' stroke='%23fffcf5' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <script>
+    /* Apply saved appearance before first paint so there is no flash. */
+    (function () {
+      var d = document.documentElement, get = function (k) { try { return JSON.parse(localStorage.getItem('mos:' + k)); } catch (e) { return null; } };
+      var t = get('theme') || 'auto';
+      d.dataset.theme = t === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : t;
+      d.dataset.wall = get('wall') || (d.dataset.theme === 'dark' ? 'night' : 'dunes');
+      if (get('accent')) d.style.setProperty('--accent', get('accent'));
+      if (get('motion') === 'reduce') d.dataset.motion = 'reduce';
+      try { if (!sessionStorage.getItem('mos:booted') && !matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('is-booting'); } catch (e) {}
+    })();
+  </script>
+  <!-- Fonts load without blocking the boot screen -->
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=VT323&display=swap" rel="stylesheet" /></noscript>
+  <link rel="stylesheet" href="assets/css/os.css" />
+  <link rel="stylesheet" href="assets/css/apps.css" />
+</head>
+<body>
+  <a class="skip" href="#desktop">Skip to desktop</a>
+
+  <!-- Boot screen -->
+  <div id="boot" class="boot" aria-hidden="true">
+    <pre class="boot__log"></pre>
+    <div class="boot__splash">
+      <div class="boot__logo"></div>
+      <div class="boot__bar"><span></span></div>
+    </div>
+    <p class="boot__skip">press any key or tap to skip</p>
+  </div>
+
+  <!-- Top menu bar (status bar on phones) -->
+  <header class="menubar" id="menubar">
+    <div class="menubar__left">
+      <button class="mb-btn mb-logo" id="logoBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="menu-logo" aria-label="MatejOS menu"></button>
+      <button class="mb-btn mb-app" id="appBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="menu-app">Finder</button>
+      <button class="mb-btn mb-menu" data-menu="go" aria-haspopup="menu" aria-expanded="false" aria-controls="menu-go">Go</button>
+      <button class="mb-btn mb-menu" data-menu="window" aria-haspopup="menu" aria-expanded="false" aria-controls="menu-window">Window</button>
+      <button class="mb-btn mb-menu" data-menu="help" aria-haspopup="menu" aria-expanded="false" aria-controls="menu-help">Help</button>
+      <span class="sb-time" aria-hidden="true"></span>
+    </div>
+    <div class="menubar__right">
+      <button class="mb-btn mb-icon" id="searchBtn" aria-label="Search MatejOS (Ctrl K)" title="Search  ⌘K"></button>
+      <button class="mb-btn mb-icon" id="themeBtn" aria-label="Toggle dark mode" title="Toggle appearance"></button>
+      <span class="sb-glyphs" aria-hidden="true"></span>
+      <button class="mb-btn mb-clock" id="clockBtn" aria-haspopup="dialog" aria-expanded="false" aria-label="Clock"><span id="clock">--:--</span></button>
+    </div>
+  </header>
+
+  <!-- Menus live here and are positioned under their buttons -->
+  <div id="menus"></div>
+
+  <!-- The desktop / phone home screen -->
+  <main id="desktop" class="desktop" tabindex="-1" aria-label="Desktop">
+    <div class="wall" aria-hidden="true"><div class="wall__art"></div></div>
+
+    <section class="hero" aria-labelledby="heroName">
+      <p class="hero__kicker"><span class="dot"></span> <span id="heroRole"></span></p>
+      <h1 class="hero__name" id="heroName"></h1>
+      <p class="hero__title" id="heroTitle"></p>
+      <p class="hero__verb" aria-live="off"><span class="hero__who"></span> <span class="typer" id="heroVerb"></span><span class="caret" aria-hidden="true"></span></p>
+    </section>
+
+    <aside class="sticky" id="sticky" aria-label="Note">
+      <button class="sticky__close" aria-label="Dismiss note">×</button>
+      <p class="sticky__title">hi, welcome in!</p>
+      <ul>
+        <li><b>Double-click</b> icons to open them</li>
+        <li><b>Drag</b> windows by their stripes</li>
+        <li><b>Right-click</b> for wallpapers</li>
+        <li><kbd>Ctrl</kbd> <kbd>K</kbd> searches everything</li>
+        <li>Terminal knows a few <b>secrets</b></li>
+      </ul>
+    </aside>
+
+    <div class="icons" id="icons" role="list" aria-label="Desktop icons"></div>
+    <div class="band" id="band" hidden></div>
+  </main>
+
+  <!-- Windows -->
+  <div id="windows" class="windows"></div>
+  <div class="snap-ghost" id="snapGhost" hidden></div>
+
+  <!-- Dock -->
+  <nav class="dock" id="dock" aria-label="Dock"><ul class="dock__list" id="dockList"></ul></nav>
+
+  <!-- Overlays -->
+  <div class="spotlight" id="spotlight" hidden>
+    <div class="spotlight__box" role="dialog" aria-modal="true" aria-label="Search MatejOS">
+      <div class="spotlight__field">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+        <input id="spotInput" type="text" autocomplete="off" spellcheck="false" placeholder="Search apps, projects, skills, experience…" role="combobox" aria-expanded="true" aria-controls="spotList" aria-autocomplete="list" />
+        <kbd>esc</kbd>
+      </div>
+      <ul class="spotlight__list" id="spotList" role="listbox" aria-label="Results"></ul>
+    </div>
+  </div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <div class="overlay" id="overlay" hidden></div>
+
+  <noscript>
+    <div class="noscript">
+      <h1>Matej Popovski</h1>
+      <p>Software &amp; Machine Learning Engineer. MatejOS needs JavaScript to boot.</p>
+      <p><a href="https://github.com/matejpopovski">GitHub</a> · <a href="https://www.linkedin.com/in/matej-popovski/">LinkedIn</a> · <a href="mailto:matej.popovski@gmail.com">Email</a></p>
+    </div>
+  </noscript>
+
+  <script src="../shared/data.js"></script>
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/wm.js"></script>
+  <script src="assets/js/apps.js"></script>
+  <script src="assets/js/terminal.js"></script>
+  <script src="assets/js/snake.js"></script>
+  <script src="assets/js/shell.js"></script>
+</body>
+</html>
