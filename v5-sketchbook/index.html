@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Matej Popovski · Lab Notebook</title>
+  <meta name="description" content="The lab notebook of Matej Popovski, software and machine learning engineer: hand-drawn project entries, a live particle filter doodle, a logbook of work and study, and a note you can fold into a paper airplane." />
+  <meta name="theme-color" content="#d9c9ab" />
+  <meta property="og:title" content="Matej Popovski · Lab Notebook" />
+  <meta property="og:description" content="Robots, vision, reinforcement learning and a lot of pencil sketches." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='4' width='50' height='56' rx='5' fill='%23fdfaf2' stroke='%2323262e' stroke-width='3'/%3E%3Cpath d='M18 4v56' stroke='%23e0675b' stroke-width='2.5'/%3E%3Cpath d='M24 22h22M24 32h18M24 42h22' stroke='%23a9c1e6' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M30 52 52 14l6 4-22 38-8 4z' fill='%23f2c14e' stroke='%2323262e' stroke-width='2.5' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Courier+Prime:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/sketch.css" />
+</head>
+<body>
+  <a class="skip" href="#about">Skip to the notebook</a>
+
+  <!-- Shared SVG filters: the wobble that makes clean vectors look hand-drawn -->
+  <svg class="defs" aria-hidden="true" focusable="false" width="0" height="0">
+    <filter id="wobble" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="n" />
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+    <filter id="wobble-strong" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="8" result="n" />
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+    <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(40)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="currentColor" stroke-width="1.4" />
+    </pattern>
+    <pattern id="hatch-red" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#c8402f" stroke-width="1.4" />
+    </pattern>
+  </svg>
+
+  <!-- Reading progress: a pencil line across the top -->
+  <div class="progress" aria-hidden="true"><span class="progress__line"></span><span class="progress__pencil"></span></div>
+
+  <!-- Index tabs -->
+  <nav class="tabs" aria-label="Notebook sections">
+    <a href="#top" data-tab="top" style="--c:var(--tab-1)">Hello</a>
+    <a href="#about" data-tab="about" style="--c:var(--tab-2)">About</a>
+    <a href="#lab" data-tab="lab" style="--c:var(--tab-3)">Lab</a>
+    <a href="#work" data-tab="work" style="--c:var(--tab-4)">Work</a>
+    <a href="#log" data-tab="log" style="--c:var(--tab-5)">Log</a>
+    <a href="#skills" data-tab="skills" style="--c:var(--tab-6)">Skills</a>
+    <a href="#contact" data-tab="contact" style="--c:var(--tab-7)">Write</a>
+  </nav>
+
+  <main class="notebook" id="notebook">
+    <!-- p.01 Hero -->
+    <section class="page page--hero" id="top" aria-labelledby="hero-name">
+      <div class="page__no" aria-hidden="true">p. 01</div>
+      <div class="coffee" role="button" tabindex="0" aria-label="A coffee ring. Click for a refill." title="refill?"></div>
+      <div class="hero">
+        <div class="hero__head">
+          <p class="type-label hero__eyebrow"><span>LAB NOTEBOOK</span> <span class="hero__no">No. 05</span> <span class="hero__prop">· property of</span></p>
+          <h1 class="hero__name" id="hero-name">
+            <span class="sr-only" data-bind="name"></span>
+            <svg class="name-svg" aria-hidden="true" focusable="false"></svg>
+          </h1>
+          <div class="hero__thatsme anno anno--red" aria-hidden="true">
+            <span>that's me!</span>
+            <svg viewBox="0 0 90 60" class="anno__arrow"><path class="d" pathLength="1" d="M74 4 C 70 26, 48 44, 10 50" /><path class="d" pathLength="1" d="M22 40 L9 50 L23 57" /></svg>
+          </div>
+        </div>
+        <div class="hero__main">
+          <p class="hero__title"><span class="tape tape--label" data-bind="title"></span></p>
+          <p class="hero__role">
+            <span class="circled"><span data-bind="role"></span><svg viewBox="0 0 300 60" preserveAspectRatio="none" aria-hidden="true"><path class="d" pathLength="1" d="M200 6 C 260 4, 298 18, 294 32 C 290 50, 200 57, 130 55 C 60 53, 4 46, 6 28 C 8 12, 70 4, 150 4 C 190 4, 220 8, 236 12" /></svg></span>
+          </p>
+          <div class="hero__studying anno anno--blue" aria-hidden="true">
+            <svg viewBox="0 0 90 60" class="anno__arrow"><path class="d" pathLength="1" d="M84 54 C 60 52, 30 40, 16 10" /><path class="d" pathLength="1" d="M8 22 L15 8 L28 18" /></svg>
+            <span>currently studying this</span>
+          </div>
+          <p class="hero__verb" aria-live="polite">
+            <span class="hero__verb-name" data-bind="firstName"></span>
+            <span class="verb"><span class="verb__text"></span><svg class="verb__scribble" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2 22 C 30 6, 40 34, 70 16 S 110 30, 140 14 S 190 32, 220 16 S 270 30, 298 18 M6 28 C 60 12, 120 30, 180 18 S 260 26, 296 12" /></svg></span>
+          </p>
+          <p class="hero__loc"><svg class="pin" viewBox="0 0 24 32" aria-hidden="true"><path d="M12 30 C 6 20, 3 15, 3 11 a9 9 0 0 1 18 0 c0 4 -3 9 -9 19z" /><circle cx="12" cy="11" r="3.4" /></svg><span data-bind="location"></span></p>
+        </div>
+        <aside class="hero__notes" aria-label="Quick facts (sticky notes you can drag)">
+          <p class="hero__notes-hint anno anno--pencil" aria-hidden="true">quick facts ↓ <small>(drag them around)</small></p>
+          <div class="notes" id="notes"></div>
+          <button type="button" class="link-btn notes__tidy" id="tidyNotes" hidden>tidy up the notes</button>
+        </aside>
+      </div>
+      <a class="turn" href="#about"><span>turn the page</span>
+        <svg viewBox="0 0 40 50" aria-hidden="true"><path class="d" pathLength="1" d="M20 4 C 16 18, 24 28, 20 44" /><path class="d" pathLength="1" d="M10 34 L20 46 L30 34" /></svg>
+      </a>
+    </section>
+
+    <!-- p.02 About -->
+    <section class="page" id="about" aria-labelledby="about-h">
+      <div class="page__no" aria-hidden="true">p. 02</div>
+      <header class="page__head">
+        <p class="margin-note">re: me</p>
+        <h2 id="about-h" class="h-sketch"><span>About me</span></h2>
+      </header>
+      <div class="about">
+        <div class="about__text" id="aboutText"></div>
+        <figure class="about__edu card card--index" aria-labelledby="edu-h">
+          <span class="clip" aria-hidden="true"></span>
+          <h3 id="edu-h" class="type-label">Education</h3>
+          <ul id="eduList" class="edu"></ul>
+        </figure>
+      </div>
+    </section>
+
+    <!-- p.03 Live particle filter -->
+    <section class="page" id="lab" aria-labelledby="lab-h">
+      <div class="page__no" aria-hidden="true">p. 03</div>
+      <header class="page__head">
+        <p class="margin-note">fig. 1</p>
+        <h2 id="lab-h" class="h-sketch"><span>Where am I?</span></h2>
+        <p class="lede">A live pencil sketch of Monte Carlo localization, the idea behind my <a href="#entry-particle-filter-simulator" class="ink-link" data-open-entry="particle-filter-simulator">particle filter simulator</a>. The robot only knows its noisy distance to the four stars. Each dot is one guess of where it might be. <strong>Click (or tap) anywhere in the room to drive it there</strong> and watch the guesses agree.</p>
+      </header>
+      <figure class="pf">
+        <div class="pf__frame">
+          <canvas id="pf" class="pf__canvas" tabindex="0" aria-label="Particle filter demo. Click or tap in the room to drive the robot. With the canvas focused, arrow keys drive it, K kidnaps the robot, R scatters the particles."></canvas>
+          <span class="tape tape--tl" aria-hidden="true"></span><span class="tape tape--br" aria-hidden="true"></span>
+        </div>
+        <figcaption class="pf__bar">
+          <div class="pf__stats type-label" aria-live="off">
+            <span>particles <b id="pfN">0</b></span>
+            <span>spread <b id="pfSpread">–</b></span>
+            <span>error <b id="pfErr">–</b></span>
+            <span class="pf__state" id="pfState">lost</span>
+          </div>
+          <div class="pf__btns">
+            <button type="button" class="btn-sketch" id="pfKidnap">kidnap the robot</button>
+            <button type="button" class="btn-sketch" id="pfScatter">scatter guesses</button>
+            <button type="button" class="btn-sketch" id="pfRays" aria-pressed="true">sensor lines</button>
+          </div>
+        </figcaption>
+        <p class="pf__legend anno anno--pencil"><span><i class="lg lg--robot"></i> the robot (truth)</span> <span><i class="lg lg--est"></i> its best guess</span> <span><i class="lg lg--dot"></i> particles</span> <span><i class="lg lg--star"></i> landmarks</span></p>
+      </figure>
+    </section>
+
+    <!-- p.04 Projects -->
+    <section class="page" id="work" aria-labelledby="work-h">
+      <div class="page__no" aria-hidden="true">p. 04</div>
+      <header class="page__head">
+        <p class="margin-note">entries</p>
+        <h2 id="work-h" class="h-sketch"><span>Notebook entries</span></h2>
+        <p class="lede">Things I've built, favourites first. Each one gets a sketch of how it works. Open an entry for the full page.</p>
+        <div class="filters" role="group" aria-label="Filter entries by area" id="filters"></div>
+      </header>
+      <ol class="entries" id="entries"></ol>
+    </section>
+
+    <!-- p.05 Logbook -->
+    <section class="page" id="log" aria-labelledby="log-h">
+      <div class="page__no" aria-hidden="true">p. 05</div>
+      <header class="page__head">
+        <p class="margin-note">log</p>
+        <h2 id="log-h" class="h-sketch"><span>Logbook</span></h2>
+        <p class="lede">Work and study, newest first. Dates are in the margin, where they belong.</p>
+      </header>
+      <div class="log">
+        <svg class="log__line" aria-hidden="true" preserveAspectRatio="none"><path class="log__path" /></svg>
+        <ol class="log__list" id="logList"></ol>
+      </div>
+      <div class="courses">
+        <h3 class="type-label">Coursework worth a look</h3>
+        <ul class="courses__list" id="courses"></ul>
+      </div>
+    </section>
+
+    <!-- p.06 Skills -->
+    <section class="page" id="skills" aria-labelledby="skills-h">
+      <div class="page__no" aria-hidden="true">p. 06</div>
+      <header class="page__head">
+        <p class="margin-note">tools</p>
+        <h2 id="skills-h" class="h-sketch"><span>Toolbox</span></h2>
+        <p class="lede">An inventory, ticked off by hand. Plus a sheet of stickers (go on, poke one).</p>
+      </header>
+      <div class="toolbox" id="stack"></div>
+      <div class="stickers" id="stickers" aria-label="Skills"></div>
+
+      <div class="game card card--index" id="game" aria-labelledby="game-h">
+        <span class="tape tape--top" aria-hidden="true"></span>
+        <h3 id="game-h" class="game__title">Margin game: guess the word before the robot finishes building itself</h3>
+        <div class="game__body">
+          <svg class="game__robot" viewBox="0 0 120 140" aria-hidden="true"></svg>
+          <div class="game__play">
+            <p class="game__word" id="gameWord" aria-live="polite"></p>
+            <p class="game__msg anno anno--red" id="gameMsg" aria-live="polite"></p>
+            <div class="game__keys" id="gameKeys" role="group" aria-label="Letters"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- p.07 Contact -->
+    <section class="page page--contact" id="contact" aria-labelledby="contact-h">
+      <div class="page__no" aria-hidden="true">p. 07</div>
+      <header class="page__head">
+        <p class="margin-note">P.S.</p>
+        <h2 id="contact-h" class="h-sketch"><span>Write me a note</span></h2>
+      </header>
+      <div class="contact">
+        <div class="torn" id="torn">
+          <span class="stamp" aria-hidden="true"><svg viewBox="0 0 64 48"><path d="M2 22 L62 2 L40 46 L28 30 Z" /><path d="M62 2 L28 30 L26 44 L34 36" /></svg><span class="stamp__loc" data-bind="location"></span></span>
+          <span class="postmark" aria-hidden="true"></span>
+          <p class="torn__to type-label">To: <span data-bind="name"></span></p>
+          <p class="torn__body">Hiring, collaborating, or just want to talk robots and models? Tear this page out, fold it, and it'll fly straight to my inbox.</p>
+          <a class="plane-btn" id="planeBtn" href="#">
+            <svg class="plane" viewBox="0 0 64 48" aria-hidden="true"><path d="M2 22 L62 2 L40 46 L28 30 Z" /><path d="M62 2 L28 30 L26 44 L34 36" /></svg>
+            <span>fold &amp; send</span>
+          </a>
+          <p class="torn__email"><a class="ink-link" data-bind-email href="#"></a></p>
+        </div>
+        <ul class="links" id="links"></ul>
+      </div>
+      <footer class="foot">
+        <p><span data-bind="name"></span> · <span data-bind="location"></span> · <span id="year"></span></p>
+        <p class="foot__small">Drawn by hand in vanilla JS. Coffee consumed while you were here: <b id="coffeeCount">1</b>. Psst: try the pencil case in the corner, or type <kbd>robot</kbd>.</p>
+      </footer>
+    </section>
+
+    <!-- Visitor doodle layer -->
+    <svg class="scribbles" id="scribbles" aria-hidden="true"></svg>
+  </main>
+
+  <!-- Pencil case (tools) -->
+  <div class="case" role="toolbar" aria-label="Notebook tools">
+    <div class="case__inks" id="inks" hidden>
+      <button type="button" class="ink-dot" data-ink="#3a3d44" aria-label="Pencil" aria-pressed="true"></button>
+      <button type="button" class="ink-dot" data-ink="#1f4fa8" aria-label="Blue pen" aria-pressed="false"></button>
+      <button type="button" class="ink-dot" data-ink="#c8402f" aria-label="Red pen" aria-pressed="false"></button>
+      <button type="button" class="ink-dot ink-dot--hl" data-ink="hl" aria-label="Highlighter" aria-pressed="false"></button>
+    </div>
+    <button type="button" class="tool" id="toolDraw" aria-pressed="false" title="Doodle on the page (D)">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 26 L8 19 L22 5 L27 10 L13 24 Z" /><path d="M19 8 L24 13" /><path d="M6 26 L13 24" /></svg>
+      <span class="tool__label">doodle</span>
+    </button>
+    <button type="button" class="tool" id="toolErase" title="Erase your doodles">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 20 L16 9 L26 19 L18 27 L11 27 Z" /><path d="M10 15 L20 25" /><path d="M14 27 L28 27" /></svg>
+      <span class="tool__label">erase</span>
+    </button>
+    <button type="button" class="tool" id="toolLamp" aria-pressed="false" title="Desk lamp (L)">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 28 L22 28" /><path d="M14 28 L12 18 L20 10" /><path d="M16 4 L26 10 L22 16 Z" /><path d="M24 15 L27 19" /></svg>
+      <span class="tool__label">lamp</span>
+    </button>
+  </div>
+
+  <div class="lamp" aria-hidden="true"></div>
+  <div class="toast anno" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Full page entry -->
+  <dialog class="entry" id="entry" aria-labelledby="entryTitle">
+    <div class="entry__spread">
+      <div class="entry__left">
+        <p class="type-label entry__meta" id="entryMeta"></p>
+        <h2 class="entry__title" id="entryTitle"></h2>
+        <p class="entry__tag" id="entryTag"></p>
+        <p class="entry__blurb" id="entryBlurb"></p>
+        <ul class="checklist" id="entryBullets"></ul>
+        <div class="entry__foot">
+          <p class="entry__stat" id="entryStat"></p>
+          <a class="btn-sketch btn-sketch--ink" id="entryLink" href="#" target="_blank" rel="noopener">open the project ↗</a>
+        </div>
+      </div>
+      <div class="entry__right">
+        <div class="entry__doodle" id="entryDoodle"></div>
+        <figure class="polaroid" id="entryShot">
+          <span class="tape tape--top" aria-hidden="true"></span>
+          <div class="polaroid__img"><img id="entryImg" alt="" decoding="async" loading="lazy" /></div>
+          <figcaption id="entryCap"></figcaption>
+        </figure>
+        <p class="entry__nophoto anno anno--pencil" id="entryNoPhoto" hidden>no photo for this entry.<br>the sketch will have to do ↑</p>
+      </div>
+    </div>
+    <div class="entry__nav">
+      <button type="button" class="btn-sketch" id="entryPrev">← prev entry</button>
+      <span class="type-label" id="entryCount"></span>
+      <button type="button" class="btn-sketch" id="entryNext">next entry →</button>
+    </div>
+    <button type="button" class="entry__close" id="entryClose" aria-label="Close entry">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 8 C 14 14, 20 20, 25 25" /><path d="M25 7 C 18 14, 13 19, 7 26" /></svg>
+    </button>
+  </dialog>
+
+  <noscript><p class="noscript">This notebook draws itself with JavaScript. Turn it on to read it, or find Matej at github.com/matejpopovski.</p></noscript>
+
+  <script src="../shared/data.js"></script>
+  <script src="assets/js/doodles.js"></script>
+  <script src="assets/js/pf.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/extras.js"></script>
+</body>
+</html>
