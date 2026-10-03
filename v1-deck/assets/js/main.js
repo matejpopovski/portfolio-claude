@@ -400,7 +400,8 @@
       const n = order.length;
       const w = els[0].offsetWidth;
       const avail = hand.clientWidth;
-      const spacing = Math.min(w * 0.6, (avail - w - 80) / (n - 1));
+      // Leave room for the outer cards' rotation so they stay on screen.
+      const spacing = Math.min(w * 0.6, (avail - w * 1.6 - 80) / (n - 1));
       const spread = Math.min(30, 6 * n);
       order.forEach((idx, pos) => {
         const el = els[idx];
