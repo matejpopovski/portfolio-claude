@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Matej Popovski</title>
+  <meta name="description" content="Matej Popovski: computer science, robotics, machine learning and games. Pick a card." />
+  <meta name="theme-color" content="#0d0c0b" />
+  <meta property="og:title" content="Matej Popovski" />
+  <meta property="og:description" content="Computer science, robotics, machine learning and games. Pick a card." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d0c0b'/%3E%3Ctext x='32' y='45' font-size='38' text-anchor='middle' fill='%23ff4d2e'%3E%E2%99%A0%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body class="is-loading">
+  <!-- Loader -->
+  <div class="loader" aria-hidden="true">
+    <div class="loader__deck">
+      <span class="loader__card">♠</span><span class="loader__card">♥</span><span class="loader__card">♦</span><span class="loader__card">♣</span>
+    </div>
+    <div class="loader__count"><span id="loaderCount">00</span></div>
+    <div class="loader__label">shuffling the deck</div>
+  </div>
+
+  <!-- Cursor -->
+  <div class="cursor" aria-hidden="true"><div class="cursor__dot"></div><div class="cursor__ring"><span class="cursor__label"></span></div></div>
+  <div class="glow" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- Nav -->
+  <header class="nav">
+    <a href="#top" class="nav__logo" data-cursor="home" aria-label="Back to top"><span class="nav__suit">♠</span> MP</a>
+    <nav class="nav__links" aria-label="Sections">
+      <a href="#about" data-cursor="go">About</a>
+      <a href="#work" data-cursor="go">Work</a>
+      <a href="#lab" data-cursor="go">Lab</a>
+      <a href="#contact" data-cursor="go">Contact</a>
+    </nav>
+    <button class="nav__term" id="termOpen" data-cursor="hack" aria-label="Open terminal"><span class="kbd">`</span> terminal</button>
+  </header>
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <canvas id="heroCanvas" aria-hidden="true"></canvas>
+      <h1 class="sr-only">Matej Popovski</h1>
+      <div class="hero__meta hero__meta--tl">
+        <span class="mono">Portfolio / 2026</span>
+        <span class="mono muted" id="role"></span>
+      </div>
+      <div class="hero__meta hero__meta--tr mono">
+        <span>43.07°N 89.40°W</span>
+        <span class="muted">Madison <span id="clock">--:--:--</span></span>
+      </div>
+      <div class="hero__line">
+        <span class="serif">Matej</span>
+        <span class="hero__verb serif"><em id="verb"></em><span class="caret"></span></span>
+      </div>
+      <div class="hero__hint mono muted">
+        <span>move your cursor through the name</span>
+        <span class="dot">·</span>
+        <span>click to scatter</span>
+      </div>
+      <a href="#about" class="hero__scroll" data-cursor="scroll" aria-label="Scroll down">
+        <span class="hero__scroll-track"><span class="hero__scroll-thumb"></span></span>
+      </a>
+    </section>
+
+    <!-- Marquee -->
+    <section class="marquee" aria-label="Skills">
+      <div class="marquee__row" data-dir="1"><div class="marquee__inner" id="mq1"></div></div>
+      <div class="marquee__row marquee__row--alt" data-dir="-1"><div class="marquee__inner" id="mq2"></div></div>
+    </section>
+
+    <!-- About -->
+    <section class="about" id="about">
+      <div class="section-label mono"><span>01</span> About</div>
+      <p class="about__big serif" id="aboutBig"></p>
+      <div class="about__grid">
+        <div class="about__text" id="aboutText"></div>
+        <dl class="about__facts" id="facts"></dl>
+      </div>
+    </section>
+
+    <!-- Work -->
+    <section class="work" id="work">
+      <div class="section-label mono"><span>02</span> Work</div>
+      <div class="work__head">
+        <h2 class="work__title serif" data-split>Pick a <em>card.</em></h2>
+        <p class="work__sub">Every project is in the deck. Hover to peek, click to turn it over.</p>
+        <button class="btn" id="shuffle" data-cursor="shuffle"><span>Shuffle the deck</span><span class="btn__icon">↻</span></button>
+      </div>
+      <div class="hand" id="hand"></div>
+      <div class="table-felt" aria-hidden="true"></div>
+    </section>
+
+    <!-- Lab -->
+    <section class="lab" id="lab">
+      <div class="section-label mono"><span>03</span> Lab</div>
+      <h2 class="lab__title serif" data-split>Things to <em>poke at.</em></h2>
+      <p class="lab__sub">Three toys, each a tiny remix of a real project.</p>
+
+      <div class="lab__grid">
+        <article class="panel panel--robot" data-reveal>
+          <header class="panel__head">
+            <div>
+              <span class="mono muted">exp.01 / autonomous robotics</span>
+              <h3 class="serif">Robot, explore the room.</h3>
+            </div>
+            <div class="panel__stats mono">
+              <span>mapped <b id="mapped">0%</b></span>
+              <span>mode <b id="robotMode">explore</b></span>
+            </div>
+          </header>
+          <div class="robot-wrap" data-cursor="goal">
+            <canvas id="robotCanvas"></canvas>
+          </div>
+          <footer class="panel__foot mono muted">
+            <span>Lidar + occupancy grid + A* replanning. Click anywhere to send it a goal.</span>
+            <button class="chip" id="robotReset" data-cursor="new">new room</button>
+          </footer>
+        </article>
+
+        <article class="panel panel--wordle" data-reveal id="wordlePanel">
+          <header class="panel__head">
+            <div>
+              <span class="mono muted">exp.02 / wordle</span>
+              <h3 class="serif">Six tries. Five letters.</h3>
+            </div>
+            <button class="chip" id="wordleNew" data-cursor="new">new word</button>
+          </header>
+          <div class="wordle" id="wordle" tabindex="0" aria-label="Wordle board. Type letters to guess."></div>
+          <div class="wordle__msg mono" id="wordleMsg">Click the board and start typing.</div>
+          <div class="keys" id="keys"></div>
+        </article>
+
+        <article class="panel panel--race" data-reveal>
+          <header class="panel__head">
+            <div>
+              <span class="mono muted">exp.03 / cpu vs gpu</span>
+              <h3 class="serif">Ten epochs. Two chips.</h3>
+            </div>
+            <button class="chip chip--accent" id="raceGo" data-cursor="train">train</button>
+          </header>
+          <div class="race">
+            <div class="lane" id="laneCpu">
+              <div class="lane__top mono"><span>CPU</span><span class="lane__stat">epoch <b>0</b>/10 · acc <b>0.0%</b></span></div>
+              <div class="lane__bar"><div class="lane__fill"></div></div>
+              <div class="lane__time mono muted">0.00s</div>
+            </div>
+            <div class="lane lane--gpu" id="laneGpu">
+              <div class="lane__top mono"><span>GPU · MPS</span><span class="lane__stat">epoch <b>0</b>/10 · acc <b>0.0%</b></span></div>
+              <div class="lane__bar"><div class="lane__fill"></div></div>
+              <div class="lane__time mono muted">0.00s</div>
+            </div>
+            <canvas id="lossCanvas" aria-label="Loss curves"></canvas>
+            <div class="race__verdict serif" id="raceVerdict">Press <em>train</em> to start the MNIST race.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact" id="contact">
+      <div class="section-label mono"><span>04</span> Contact</div>
+      <h2 class="contact__title serif" data-split>Let's build <em>something</em> good.</h2>
+      <div class="contact__row">
+        <a class="magnet" href="https://github.com/matejpopovski" target="_blank" rel="noopener" data-cursor="say hi">
+          <span class="magnet__inner">Say hi<br/><small>on GitHub ↗</small></span>
+        </a>
+        <ul class="contact__links" id="links"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer mono muted">
+    <span>© <span id="year"></span> Matej Popovski</span>
+    <span class="footer__mid">Hand-built. No frameworks. Press <span class="kbd">`</span> for a terminal.</span>
+    <span class="footer__konami" title="try it">↑ ↑ ↓ ↓ ← → ← → B A</span>
+  </footer>
+
+  <!-- Card detail overlay -->
+  <div class="spotlight" id="spotlight" aria-hidden="true">
+    <div class="spotlight__card" id="spotCard"></div>
+    <div class="spotlight__hint mono muted">click anywhere or press esc to put it back</div>
+  </div>
+
+  <!-- Terminal -->
+  <div class="term" id="term" aria-hidden="true" role="dialog" aria-label="Terminal">
+    <div class="term__win">
+      <div class="term__bar"><i></i><i></i><i></i><span class="mono">matej@portfolio: ~</span><button class="term__x" id="termClose" aria-label="Close terminal">×</button></div>
+      <div class="term__body mono" id="termBody"></div>
+      <form class="term__form mono" id="termForm" autocomplete="off">
+        <label for="termInput">❯</label>
+        <input id="termInput" spellcheck="false" autocapitalize="off" />
+      </form>
+    </div>
+  </div>
+
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
