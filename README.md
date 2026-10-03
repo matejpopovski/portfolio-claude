@@ -13,6 +13,9 @@ Six hand-built, zero-build portfolio designs to choose from. The root `index.htm
 
 All versions read their content from [`shared/data.js`](shared/data.js).
 
+**Preview this branch without deploying:**
+https://raw.githack.com/matejpopovski/portfolio-claude/claude/quirky-hamilton-e6dhvt/index.html
+
 ## v1: The Deck
 
 - **Hero** — the name drawn as ~5,000 particles that dodge your cursor and scatter on click.

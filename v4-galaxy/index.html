@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Matej Popovski · Galaxy — Software &amp; ML Engineer</title>
+  <meta name="description" content="Matej Popovski, software and machine learning engineer. Fly through a 3D solar system where every project is a planet: computer vision, robotics, reinforcement learning and more." />
+  <meta name="theme-color" content="#03040b" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:title" content="Matej Popovski · Galaxy" />
+  <meta property="og:description" content="A 3D solar system of projects in computer vision, robotics and machine learning. Matej is the star; his work orbits him." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2303040b'/%3E%3Cellipse cx='32' cy='32' rx='25' ry='9' fill='none' stroke='%235fd4ff' stroke-width='2' transform='rotate(-24 32 32)'/%3E%3Ccircle cx='32' cy='32' r='10' fill='%23ffb547'/%3E%3Ccircle cx='52' cy='22' r='3.6' fill='%23c393ff'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;700&family=Martian+Mono:wght@300;400;500&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/galaxy.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#manifest" id="skip-link">Skip to the list view</a>
+
+  <!-- 3D stage (decorative: every object in it also has an HTML control) -->
+  <div class="stage" aria-hidden="true">
+    <canvas id="scene"></canvas>
+    <div class="vignette"></div>
+    <div class="scanlines"></div>
+  </div>
+
+  <div id="reticle" class="reticle" aria-hidden="true">
+    <i></i><i></i><i></i><i></i>
+    <div class="reticle-read"><b data-r="name"></b><span data-r="meta"></span></div>
+  </div>
+  <div class="warp-flash" aria-hidden="true"></div>
+
+  <!-- HUD frame corners -->
+  <div class="frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+  <header class="hud hud-top" data-hud>
+    <div class="brand">
+      <p class="brand-kicker"><span class="blink" aria-hidden="true">●</span> <span id="readout-clock">T+ 00:00:00</span></p>
+      <h1 id="brand-name" class="brand-name">Matej Popovski</h1>
+      <p id="brand-title" class="brand-title"></p>
+      <p class="verb" aria-hidden="true"><span id="verb-pre"></span> <span id="verb-text"></span><span class="caret"></span></p>
+    </div>
+    <nav id="nav" class="nav" aria-label="Sections">
+      <button type="button" class="nav-home" id="home-btn" aria-label="Back to orbit overview"><span aria-hidden="true">◎</span></button>
+      <button type="button" data-go="about"><span class="n" aria-hidden="true">01</span><span class="ico" aria-hidden="true">☉</span><span class="long">The star</span><span class="short">Star</span></button>
+      <button type="button" data-go="voyage"><span class="n" aria-hidden="true">02</span><span class="ico" aria-hidden="true">☄</span><span class="long">Voyage log</span><span class="short">Log</span></button>
+      <button type="button" data-go="skills"><span class="n" aria-hidden="true">03</span><span class="ico" aria-hidden="true">✦</span><span class="long">Skills</span><span class="short">Sky</span></button>
+      <button type="button" data-go="contact"><span class="n" aria-hidden="true">04</span><span class="ico" aria-hidden="true">⌁</span><span class="long">Transmit</span><span class="short">Signal</span></button>
+      <button type="button" data-action="list" aria-pressed="false" class="nav-list"><span class="ico" aria-hidden="true">☰</span><span class="long">List view</span><span class="short">List</span></button>
+    </nav>
+    <div class="top-tools">
+      <button type="button" id="warp-btn-m" class="round-btn" aria-label="Warp to a random planet"><span aria-hidden="true">⟿</span></button>
+      <button type="button" id="help-btn" class="round-btn" aria-label="Keyboard shortcuts and help"><span aria-hidden="true">?</span></button>
+    </div>
+  </header>
+
+  <!-- Projected labels for the star, planets, beacons and skill stars (created by scene.js); after the header so Tab reaches the nav first -->
+  <div id="labels" class="labels" data-hud aria-label="Objects in the system" role="group"></div>
+
+  <div class="hud hud-bottom" data-hud>
+    <div class="nav-module">
+      <div class="radar-wrap">
+        <canvas id="radar" class="radar" width="140" height="140" aria-label="Orbital radar. Click a dot to fly to that planet." role="img"></canvas>
+        <span class="radar-label" aria-hidden="true">Orbital radar</span>
+      </div>
+      <dl class="readout" aria-hidden="true">
+        <div><dt>Sector</dt><dd id="readout-sector"></dd></div>
+        <div><dt>Target</dt><dd id="readout-target">—</dd></div>
+        <div><dt>Cam</dt><dd id="readout-cam">+000.0 +000.0 +000.0</dd></div>
+      </dl>
+    </div>
+    <p class="hint" aria-hidden="true">
+      <span class="hint-d">Drag to orbit · Scroll to zoom · Click a planet · <kbd>←</kbd><kbd>→</kbd> cycle · <kbd>W</kbd> warp · <kbd>?</kbd> help</span>
+      <span class="hint-m">Drag to orbit · Pinch to zoom · Tap a planet</span>
+    </p>
+    <div class="side-module">
+      <div class="legend">
+        <p class="legend-title">Orbits <span aria-hidden="true">/ by area</span></p>
+        <ul id="legend-list"></ul>
+      </div>
+      <button type="button" id="warp-btn" class="warp-btn"><span class="warp-ico" aria-hidden="true"></span><span>Warp</span><kbd aria-hidden="true">W</kbd></button>
+    </div>
+  </div>
+
+  <!-- Content panel: projects, the star, voyage log, skills, contact -->
+  <aside id="panel" class="panel" role="dialog" aria-modal="false" aria-labelledby="panel-title" aria-hidden="true" inert data-hud-panel>
+    <div class="panel-grip" aria-hidden="true"></div>
+    <div class="panel-head">
+      <span class="panel-kicker" id="panel-kicker"></span>
+      <button type="button" class="panel-close" aria-label="Close panel and return to orbit (Esc)"><span aria-hidden="true">✕</span><kbd aria-hidden="true">Esc</kbd></button>
+    </div>
+    <div class="panel-body" id="panel-body"></div>
+    <div class="panel-foot" id="panel-foot" hidden></div>
+  </aside>
+
+  <!-- List view: every piece of content as plain HTML. Also the fallback when 3D can't run. -->
+  <section id="manifest" class="manifest" aria-labelledby="manifest-title" hidden>
+    <div class="manifest-bar">
+      <span class="m-kicker">Flight manifest · list view</span>
+      <button type="button" id="manifest-close" class="btn">Return to orbit <kbd aria-hidden="true">L</kbd></button>
+    </div>
+    <p id="fallback-note" class="fallback-note" hidden></p>
+    <div class="manifest-inner" id="manifest-body"></div>
+  </section>
+
+  <!-- Cinematic intro -->
+  <div id="intro" class="intro" aria-hidden="true">
+    <div class="intro-inner">
+      <p class="intro-kicker" id="intro-kicker"></p>
+      <p class="intro-name" id="intro-name"></p>
+      <p class="intro-title" id="intro-title"></p>
+    </div>
+    <p class="intro-skip">Click or press any key to skip</p>
+  </div>
+
+  <form id="comms" class="comms" hidden autocomplete="off">
+    <div id="comms-log" class="comms-log" aria-live="polite"></div>
+    <label class="comms-line"><span class="prompt" aria-hidden="true">COMMS&gt;</span><input id="comms-input" type="text" spellcheck="false" autocapitalize="off" aria-label="Comms console command" placeholder="type help" /></label>
+  </form>
+
+  <dialog id="help" class="help" aria-labelledby="help-title">
+    <h2 id="help-title">Flight controls</h2>
+    <dl class="keys">
+      <div><dt><kbd>Drag</kbd> / <kbd>Scroll</kbd></dt><dd>Orbit and zoom the camera</dd></div>
+      <div><dt><kbd>Click</kbd> / <kbd>Tab</kbd> + <kbd>Enter</kbd></dt><dd>Fly to a planet, the star or a beacon</dd></div>
+      <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Previous / next project</dd></div>
+      <div><dt><kbd>1</kbd>–<kbd>4</kbd></dt><dd>The star, voyage log, skills, transmit</dd></div>
+      <div><dt><kbd>Esc</kbd> / <kbd>0</kbd></dt><dd>Back to orbit</dd></div>
+      <div><dt><kbd>W</kbd></dt><dd>Warp to a random planet</dd></div>
+      <div><dt><kbd>T</kbd></dt><dd>Bend time (orbits ×14)</dd></div>
+      <div><dt><kbd>L</kbd></dt><dd>List view of everything</dd></div>
+      <div><dt><kbd>/</kbd></dt><dd>Comms console</dd></div>
+    </dl>
+    <p class="help-note">Some things are hidden. The star doesn't like being poked too often.</p>
+    <div class="btn-row">
+      <button type="button" class="btn" data-comms>Open comms console</button>
+      <button type="button" class="btn btn-accent" data-close>Close</button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="stats" class="stats" hidden></div>
+
+  <noscript>
+    <div class="noscript">This portfolio renders from JavaScript. Please enable it to see Matej's projects.</div>
+  </noscript>
+
+  <script src="../shared/data.js"></script>
+  <script type="module" src="assets/js/main.js"></script>
+</body>
+</html>
