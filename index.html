@@ -3,205 +3,57 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Matej Popovski</title>
-  <meta name="description" content="Matej Popovski: computer science, robotics, machine learning and games. Pick a card." />
-  <meta name="theme-color" content="#0d0c0b" />
-  <meta property="og:title" content="Matej Popovski" />
-  <meta property="og:description" content="Computer science, robotics, machine learning and games. Pick a card." />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d0c0b'/%3E%3Ctext x='32' y='45' font-size='38' text-anchor='middle' fill='%23ff4d2e'%3E%E2%99%A0%3C/text%3E%3C/svg%3E" />
+  <title>Matej Popovski · Pick a Design</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* Layout: a single column of six numbered rows, one per design, each a big link. */
+    :root {
+      --bg: #f3f0ea; --fg: #1b1a17; --muted: #6f6a60; --line: rgba(27,26,23,.14); --accent: #2f4bd8;
+      --display: "Fraunces", Georgia, serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #131210; --fg: #f1ece2; --muted: #9a9387; --line: rgba(241,236,226,.14); --accent: #8ea0ff; color-scheme: dark; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--display); padding: 0 16px; }
+    main { max-width: 1040px; margin: 0 auto; padding-block: clamp(48px, 10vh, 120px); }
+    .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+    h1 { font-size: clamp(44px, 8vw, 96px); line-height: .95; font-weight: 400; margin: 18px 0 16px; text-wrap: balance; }
+    h1 em { color: var(--accent); }
+    .lede { font-size: 19px; line-height: 1.5; color: var(--muted); max-width: 34em; margin: 0 0 48px; }
+    ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); counter-reset: v; }
+    li a {
+      display: grid; grid-template-columns: 3.2em 1fr auto; gap: 8px 20px; align-items: baseline;
+      padding: 22px 0; border-bottom: 1px solid var(--line); color: inherit; text-decoration: none;
+      transition: padding .4s cubic-bezier(.22,1,.36,1), color .3s;
+    }
+    li a:hover, li a:focus-visible { padding-left: 12px; color: var(--accent); outline: none; }
+    .n { font: 500 13px var(--mono); color: var(--muted); }
+    .name { font-size: clamp(28px, 4vw, 44px); line-height: 1.05; }
+    .desc { grid-column: 2; font: 400 14px/1.5 var(--mono); color: var(--muted); max-width: 52em; }
+    .go { font-size: 24px; grid-row: 1; grid-column: 3; transition: transform .4s cubic-bezier(.22,1,.36,1); }
+    li a:hover .go { transform: translateX(6px); }
+    footer { margin-top: 48px; font: 400 13px/1.6 var(--mono); color: var(--muted); }
+    @media (max-width: 560px) { li a { grid-template-columns: 2.4em 1fr auto; } }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
 </head>
-<body class="is-loading">
-  <!-- Loader -->
-  <div class="loader" aria-hidden="true">
-    <div class="loader__deck">
-      <span class="loader__card">♠</span><span class="loader__card">♥</span><span class="loader__card">♦</span><span class="loader__card">♣</span>
-    </div>
-    <div class="loader__count"><span id="loaderCount">00</span></div>
-    <div class="loader__label">shuffling the deck</div>
-  </div>
-
-  <!-- Cursor -->
-  <div class="cursor" aria-hidden="true"><div class="cursor__dot"></div><div class="cursor__ring"><span class="cursor__label"></span></div></div>
-  <div class="glow" aria-hidden="true"></div>
-  <div class="grain" aria-hidden="true"></div>
-
-  <!-- Nav -->
-  <header class="nav">
-    <a href="#top" class="nav__logo" data-cursor="home" aria-label="Back to top"><span class="nav__suit">♠</span> MP</a>
-    <nav class="nav__links" aria-label="Sections">
-      <a href="#about" data-cursor="go">About</a>
-      <a href="#work" data-cursor="go">Work</a>
-      <a href="#lab" data-cursor="go">Lab</a>
-      <a href="#contact" data-cursor="go">Contact</a>
-    </nav>
-    <button class="nav__term" id="termOpen" data-cursor="hack" aria-label="Open terminal"><span class="kbd">`</span> terminal</button>
-  </header>
-
-  <main id="top">
-    <!-- Hero -->
-    <section class="hero" id="hero">
-      <canvas id="heroCanvas" aria-hidden="true"></canvas>
-      <h1 class="sr-only">Matej Popovski</h1>
-      <div class="hero__meta hero__meta--tl">
-        <span class="mono">Portfolio / 2026</span>
-        <span class="mono muted" id="role"></span>
-      </div>
-      <div class="hero__meta hero__meta--tr mono">
-        <span>43.07°N 89.40°W</span>
-        <span class="muted">Madison <span id="clock">--:--:--</span></span>
-      </div>
-      <div class="hero__line">
-        <span class="serif">Matej</span>
-        <span class="hero__verb serif"><em id="verb"></em><span class="caret"></span></span>
-      </div>
-      <div class="hero__hint mono muted">
-        <span>move your cursor through the name</span>
-        <span class="dot">·</span>
-        <span>click to scatter</span>
-      </div>
-      <a href="#about" class="hero__scroll" data-cursor="scroll" aria-label="Scroll down">
-        <span class="hero__scroll-track"><span class="hero__scroll-thumb"></span></span>
-      </a>
-    </section>
-
-    <!-- Marquee -->
-    <section class="marquee" aria-label="Skills">
-      <div class="marquee__row" data-dir="1"><div class="marquee__inner" id="mq1"></div></div>
-      <div class="marquee__row marquee__row--alt" data-dir="-1"><div class="marquee__inner" id="mq2"></div></div>
-    </section>
-
-    <!-- About -->
-    <section class="about" id="about">
-      <div class="section-label mono"><span>01</span> About</div>
-      <p class="about__big serif" id="aboutBig"></p>
-      <div class="about__grid">
-        <div class="about__text" id="aboutText"></div>
-        <dl class="about__facts" id="facts"></dl>
-      </div>
-    </section>
-
-    <!-- Work -->
-    <section class="work" id="work">
-      <div class="section-label mono"><span>02</span> Work</div>
-      <div class="work__head">
-        <h2 class="work__title serif" data-split>Pick a <em>card.</em></h2>
-        <p class="work__sub">Every project is in the deck. Hover to peek, click to turn it over.</p>
-        <button class="btn" id="shuffle" data-cursor="shuffle"><span>Shuffle the deck</span><span class="btn__icon">↻</span></button>
-      </div>
-      <div class="hand" id="hand"></div>
-      <div class="table-felt" aria-hidden="true"></div>
-    </section>
-
-    <!-- Lab -->
-    <section class="lab" id="lab">
-      <div class="section-label mono"><span>03</span> Lab</div>
-      <h2 class="lab__title serif" data-split>Things to <em>poke at.</em></h2>
-      <p class="lab__sub">Three toys, each a tiny remix of a real project.</p>
-
-      <div class="lab__grid">
-        <article class="panel panel--robot" data-reveal>
-          <header class="panel__head">
-            <div>
-              <span class="mono muted">exp.01 / autonomous robotics</span>
-              <h3 class="serif">Robot, explore the room.</h3>
-            </div>
-            <div class="panel__stats mono">
-              <span>mapped <b id="mapped">0%</b></span>
-              <span>mode <b id="robotMode">explore</b></span>
-            </div>
-          </header>
-          <div class="robot-wrap" data-cursor="goal">
-            <canvas id="robotCanvas"></canvas>
-          </div>
-          <footer class="panel__foot mono muted">
-            <span>Lidar + occupancy grid + A* replanning. Click anywhere to send it a goal.</span>
-            <button class="chip" id="robotReset" data-cursor="new">new room</button>
-          </footer>
-        </article>
-
-        <article class="panel panel--wordle" data-reveal id="wordlePanel">
-          <header class="panel__head">
-            <div>
-              <span class="mono muted">exp.02 / wordle</span>
-              <h3 class="serif">Six tries. Five letters.</h3>
-            </div>
-            <button class="chip" id="wordleNew" data-cursor="new">new word</button>
-          </header>
-          <div class="wordle" id="wordle" tabindex="0" aria-label="Wordle board. Type letters to guess."></div>
-          <div class="wordle__msg mono" id="wordleMsg">Click the board and start typing.</div>
-          <div class="keys" id="keys"></div>
-        </article>
-
-        <article class="panel panel--race" data-reveal>
-          <header class="panel__head">
-            <div>
-              <span class="mono muted">exp.03 / cpu vs gpu</span>
-              <h3 class="serif">Ten epochs. Two chips.</h3>
-            </div>
-            <button class="chip chip--accent" id="raceGo" data-cursor="train">train</button>
-          </header>
-          <div class="race">
-            <div class="lane" id="laneCpu">
-              <div class="lane__top mono"><span>CPU</span><span class="lane__stat">epoch <b>0</b>/10 · acc <b>0.0%</b></span></div>
-              <div class="lane__bar"><div class="lane__fill"></div></div>
-              <div class="lane__time mono muted">0.00s</div>
-            </div>
-            <div class="lane lane--gpu" id="laneGpu">
-              <div class="lane__top mono"><span>GPU · MPS</span><span class="lane__stat">epoch <b>0</b>/10 · acc <b>0.0%</b></span></div>
-              <div class="lane__bar"><div class="lane__fill"></div></div>
-              <div class="lane__time mono muted">0.00s</div>
-            </div>
-            <canvas id="lossCanvas" aria-label="Loss curves"></canvas>
-            <div class="race__verdict serif" id="raceVerdict">Press <em>train</em> to start the MNIST race.</div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- Contact -->
-    <section class="contact" id="contact">
-      <div class="section-label mono"><span>04</span> Contact</div>
-      <h2 class="contact__title serif" data-split>Let's build <em>something</em> good.</h2>
-      <div class="contact__row">
-        <a class="magnet" href="https://github.com/matejpopovski" target="_blank" rel="noopener" data-cursor="say hi">
-          <span class="magnet__inner">Say hi<br/><small>on GitHub ↗</small></span>
-        </a>
-        <ul class="contact__links" id="links"></ul>
-      </div>
-    </section>
+<body>
+  <main>
+    <div class="eyebrow">Matej Popovski · portfolio drafts</div>
+    <h1>Six sites. <em>Pick one.</em></h1>
+    <p class="lede">The same projects and bio, presented six completely different ways. Open each, play with it, and keep the one that feels like you.</p>
+    <ol>
+      <li><a href="v1-deck/"><span class="n">01</span><span class="name">The Deck</span><span class="go">→</span><span class="desc">Dark and editorial. A particle name, projects as a hand of playing cards, a mapping robot, Wordle, a GPU race and a hidden terminal.</span></a></li>
+      <li><a href="v2-desktop-os/"><span class="n">02</span><span class="name">MatejOS</span><span class="go">→</span><span class="desc">A whole fake operating system. Boot it up, drag windows around, open projects from a file explorer.</span></a></li>
+      <li><a href="v3-swiss/"><span class="n">03</span><span class="name">Swiss Kinetic</span><span class="go">→</span><span class="desc">Bright, precise poster design where the giant type moves with you and every project gets a generated poster.</span></a></li>
+      <li><a href="v4-galaxy/"><span class="n">04</span><span class="name">Galaxy</span><span class="go">→</span><span class="desc">A 3D solar system where each project is a planet. Fly between them.</span></a></li>
+      <li><a href="v5-sketchbook/"><span class="n">05</span><span class="name">Sketchbook</span><span class="go">→</span><span class="desc">A hand-drawn engineering notebook with doodles that draw themselves and sticky notes you can drag.</span></a></li>
+      <li><a href="v6-arcade/"><span class="n">06</span><span class="name">Arcade</span><span class="go">→</span><span class="desc">A playable pixel game. Walk a little robot around and visit each project like an arcade cabinet.</span></a></li>
+    </ol>
+    <footer>All six read their content from <code>shared/data.js</code>, so updating your bio or projects there updates every version.</footer>
   </main>
-
-  <footer class="footer mono muted">
-    <span>© <span id="year"></span> Matej Popovski</span>
-    <span class="footer__mid">Hand-built. No frameworks. Press <span class="kbd">`</span> for a terminal.</span>
-    <span class="footer__konami" title="try it">↑ ↑ ↓ ↓ ← → ← → B A</span>
-  </footer>
-
-  <!-- Card detail overlay -->
-  <div class="spotlight" id="spotlight" aria-hidden="true">
-    <div class="spotlight__card" id="spotCard"></div>
-    <div class="spotlight__hint mono muted">click anywhere or press esc to put it back</div>
-  </div>
-
-  <!-- Terminal -->
-  <div class="term" id="term" aria-hidden="true" role="dialog" aria-label="Terminal">
-    <div class="term__win">
-      <div class="term__bar"><i></i><i></i><i></i><span class="mono">matej@portfolio: ~</span><button class="term__x" id="termClose" aria-label="Close terminal">×</button></div>
-      <div class="term__body mono" id="termBody"></div>
-      <form class="term__form mono" id="termForm" autocomplete="off">
-        <label for="termInput">❯</label>
-        <input id="termInput" spellcheck="false" autocapitalize="off" />
-      </form>
-    </div>
-  </div>
-
-  <canvas id="fx" aria-hidden="true"></canvas>
-
-  <script src="assets/js/data.js"></script>
-  <script src="assets/js/main.js"></script>
 </body>
 </html>
