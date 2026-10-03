@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Matej Popovski · Software &amp; Machine Learning Engineer</title>
+  <meta name="description" content="Matej Popovski, software and machine learning engineer in Madison, Wisconsin. Robotics, computer vision and reinforcement learning projects, each printed as its own generated Swiss poster." />
+  <meta name="theme-color" content="#f1eee6" />
+  <meta name="color-scheme" content="light" />
+  <meta property="og:title" content="Matej Popovski · Swiss Kinetic" />
+  <meta property="og:description" content="Software and machine learning engineer. Every project gets a generated poster." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f1eee6'/%3E%3Ccircle cx='40' cy='24' r='18' fill='%23e4321b'/%3E%3Crect x='8' y='36' width='26' height='20' fill='%23121211'/%3E%3Crect x='8' y='8' width='4' height='24' fill='%231d3fd0'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <header class="bar">
+    <div class="bar__in">
+      <a class="mark" href="#top" aria-label="Back to top">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="20" cy="12" r="9" fill="var(--red)"/><rect x="3" y="18" width="13" height="11" fill="var(--ink)"/><rect x="3" y="3" width="2.5" height="12" fill="var(--cobalt)"/></svg>
+        <span class="mark__txt" id="markTxt"></span>
+      </a>
+      <nav class="nav" aria-label="Sections">
+        <ol>
+          <li><a href="#profile" data-sec="profile"><span class="nav__n">01</span><span class="nav__l">Profile</span></a></li>
+          <li><a href="#work" data-sec="work"><span class="nav__n">02</span><span class="nav__l">Work</span></a></li>
+          <li><a href="#schedule" data-sec="schedule"><span class="nav__n">03</span><span class="nav__l">Schedule</span></a></li>
+          <li><a href="#specimen" data-sec="specimen"><span class="nav__n">04</span><span class="nav__l">Specimen</span></a></li>
+          <li><a href="#contact" data-sec="contact"><span class="nav__n">05</span><span class="nav__l">Contact</span></a></li>
+        </ol>
+      </nav>
+      <p class="bar__time"><span class="live-dot" aria-hidden="true"></span><span id="barClock">--:--:--</span><span class="bar__city"> Madison</span></p>
+      <button class="bar__keys" id="keysBtn" type="button" aria-haspopup="dialog" aria-label="Keyboard shortcuts">?</button>
+    </div>
+  </header>
+
+  <aside class="rail" aria-hidden="true">
+    <div class="rail__line"><span id="railDot"></span></div>
+    <div class="rail__pct" id="railPct">000</div>
+    <div class="rail__label" id="railLabel">Index</div>
+    <div class="rail__num" id="railNum">00</div>
+  </aside>
+
+  <main id="main">
+    <!-- 00 · Hero -->
+    <section class="hero wrap" id="top" aria-labelledby="heroName" data-n="00" data-label="Index">
+      <div class="hero__meta g">
+        <p><span class="lbl">Portfolio</span><span id="heroYear"></span></p>
+        <p><span class="lbl">Discipline</span><span data-f="title"></span></p>
+        <p><span class="lbl">Currently</span><span data-f="role"></span></p>
+        <p><span class="lbl">Location</span><span data-f="location"></span><br /><span class="mono" id="heroClock"></span></p>
+      </div>
+      <h1 class="hero__name" id="heroName"></h1>
+      <div class="hero__disc" id="disc" aria-hidden="true"></div>
+      <div class="hero__bar" aria-hidden="true"></div>
+      <div class="hero__foot g">
+        <p class="hero__say"><span class="hero__who" id="who"></span> <span class="verb" id="verb" aria-hidden="true"></span><span class="sr-only" id="verbsSr"></span></p>
+        <div class="hero__cue">
+          <a href="#work" class="cue"><span><span id="cueCount"></span> posters, generated</span> <span class="cue__arrow" aria-hidden="true">↓</span></a>
+          <p class="hint">Move over the name. Press <button type="button" class="kbd-btn" data-grid-toggle aria-label="Toggle the grid overlay">G</button> for the grid.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 01 · Profile -->
+    <section class="sec wrap" id="profile" data-n="01" data-label="Profile" aria-labelledby="profile-h">
+      <header class="sec__head g">
+        <p class="sec__num" aria-hidden="true">01</p>
+        <h2 class="sec__title" id="profile-h">Profile</h2>
+        <p class="sec__note" id="profileNote"></p>
+      </header>
+      <div class="profile g">
+        <div class="profile__about" id="about"></div>
+        <dl class="profile__facts" id="facts"></dl>
+      </div>
+    </section>
+
+    <!-- 02 · Work -->
+    <section class="sec wrap" id="work" data-n="02" data-label="Work" aria-labelledby="work-h">
+      <header class="sec__head g">
+        <p class="sec__num" aria-hidden="true">02</p>
+        <h2 class="sec__title" id="work-h">Work</h2>
+        <p class="sec__note">Every project is printed as its own poster, generated from the letters of its title. Hover to shake it loose, open it for the details, press <kbd>R</kbd> to remix them all.</p>
+      </header>
+      <div class="tools" id="tools">
+        <div class="filters" role="group" aria-label="Filter projects by area" id="filters"></div>
+        <div class="views" role="group" aria-label="View">
+          <button type="button" class="view-btn" data-view="posters" aria-pressed="true">Posters</button>
+          <button type="button" class="view-btn" data-view="index" aria-pressed="false">Index</button>
+          <button type="button" class="view-btn view-btn--remix" id="remixAll" title="Remix every poster (R)"><span aria-hidden="true">↻</span> Remix</button>
+        </div>
+      </div>
+      <ol class="posters" id="posters"></ol>
+      <ol class="plist" id="plist" hidden></ol>
+      <p class="sr-only" id="filterStatus" role="status" aria-live="polite"></p>
+    </section>
+
+    <!-- 03 · Schedule -->
+    <section class="sec wrap" id="schedule" data-n="03" data-label="Schedule" aria-labelledby="schedule-h">
+      <header class="sec__head g">
+        <p class="sec__num" aria-hidden="true">03</p>
+        <h2 class="sec__title" id="schedule-h">Schedule</h2>
+        <div class="sec__note sec__note--clock">
+          <svg class="sclock" id="sclock" viewBox="-100 -100 200 200" role="img" aria-label="Station clock showing the time in Madison"></svg>
+          <p><span class="lbl">Local time, Madison</span><span class="mono" id="clockTxt"></span></p>
+        </div>
+      </header>
+      <div class="board-wrap">
+        <p class="board__cap"><span>Departures</span><span aria-hidden="true">Abfahrt</span><span aria-hidden="true">Départ</span><span aria-hidden="true">Partenza</span></p>
+        <table class="board" id="board">
+          <caption class="sr-only">Experience and education, newest first</caption>
+          <thead>
+            <tr><th scope="col">Year</th><th scope="col">Type</th><th scope="col">Position</th><th scope="col">Where</th><th scope="col">Duration</th></tr>
+          </thead>
+          <tbody id="boardBody"></tbody>
+        </table>
+      </div>
+      <div class="edu g">
+        <div class="edu__col">
+          <h3 class="h3">Education</h3>
+          <ol class="edu__list" id="eduList"></ol>
+        </div>
+        <div class="edu__col edu__col--courses">
+          <h3 class="h3">Coursework <span class="h3__aside">· platforms</span></h3>
+          <ol class="courses" id="courses"></ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 · Specimen -->
+    <section class="sec wrap" id="specimen" data-n="04" data-label="Specimen" aria-labelledby="specimen-h">
+      <header class="sec__head g">
+        <p class="sec__num" aria-hidden="true">04</p>
+        <h2 class="sec__title" id="specimen-h">Specimen</h2>
+        <p class="sec__note">Skills, set in Archivo, a variable grotesk with a weight and a width axis. Scroll fast and the type leans into it.</p>
+      </header>
+      <div class="marquee" id="marquee" aria-hidden="true"></div>
+      <ul class="sr-only" id="skillsSr"></ul>
+      <div class="tester g">
+        <div class="tester__pad" id="pad">
+          <span class="pad__x" aria-hidden="true"></span><span class="pad__y" aria-hidden="true"></span>
+          <span class="pad__axis pad__axis--x" aria-hidden="true">wdth →</span>
+          <span class="pad__axis pad__axis--y" aria-hidden="true">wght ↑</span>
+          <span class="pad__word" id="padWord" aria-live="polite"></span>
+        </div>
+        <div class="tester__ctl">
+          <p class="lbl">Type tester</p>
+          <p class="tester__read mono" id="padRead"></p>
+          <label class="rng"><span>Weight</span><input type="range" id="rWght" min="100" max="900" step="1" value="800" /></label>
+          <label class="rng"><span>Width</span><input type="range" id="rWdth" min="62" max="125" step="1" value="100" /></label>
+          <div class="tester__btns">
+            <button type="button" class="btn" id="padPrev" aria-label="Previous skill">← Prev</button>
+            <button type="button" class="btn" id="padNext" aria-label="Next skill">Next →</button>
+          </div>
+          <p class="hint" id="padHint">Move across the pad to set weight and width. Click for the next skill.</p>
+        </div>
+      </div>
+      <h3 class="h3 stack__h">Stack, by group</h3>
+      <ol class="stack" id="stack"></ol>
+    </section>
+
+    <!-- 05 · Contact -->
+    <section class="sec wrap contact" id="contact" data-n="05" data-label="Contact" aria-labelledby="contact-h">
+      <header class="sec__head g">
+        <p class="sec__num" aria-hidden="true">05</p>
+        <h2 class="sec__title" id="contact-h">Contact</h2>
+        <p class="sec__note">The shortest route is the email. It is also the largest thing on this page.</p>
+      </header>
+      <p class="contact__lead">Write to</p>
+      <a class="contact__mail" id="mailBig" href="#"></a>
+      <div class="contact__row g">
+        <button type="button" class="btn btn--ink" id="copyMail">Copy address</button>
+        <ul class="contact__links" id="links"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot wrap">
+    <div class="g foot__g">
+      <p><span class="lbl">Colophon</span>Set in Archivo &amp; IBM Plex Mono on a 12-column grid with an 8px baseline.</p>
+      <p><span class="lbl">Keys</span><button type="button" class="kbd-btn" data-grid-toggle aria-label="Toggle the grid overlay">G</button> grid · <button type="button" class="kbd-btn" data-remix aria-label="Remix every poster">R</button> remix · <button type="button" class="kbd-btn" data-keys aria-label="Show keyboard shortcuts">?</button> all shortcuts</p>
+      <p><span class="lbl">Signed</span><span id="footName"></span> <span id="footYear"></span></p>
+      <p><a href="#top" class="top-link">Back to top ↑</a></p>
+    </div>
+  </footer>
+
+  <div class="grid-overlay" id="gridOverlay" aria-hidden="true"><div class="grid-overlay__cols"></div></div>
+  <div class="peek" id="peek" aria-hidden="true"></div>
+  <div class="stamp" id="stamp" aria-hidden="true"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="print-sheet" id="printSheet" aria-hidden="true"></div>
+
+  <!-- Poster detail -->
+  <dialog class="detail" id="detail" aria-labelledby="dTitle">
+    <div class="detail__bar">
+      <p class="detail__crumb mono" id="dCrumb"></p>
+      <div class="detail__nav">
+        <button type="button" class="btn" id="dPrev" aria-label="Previous project">←</button>
+        <button type="button" class="btn" id="dNext" aria-label="Next project">→</button>
+        <button type="button" class="btn btn--ink" id="dClose" aria-label="Close">Close <kbd>Esc</kbd></button>
+      </div>
+    </div>
+    <div class="detail__body">
+      <div class="detail__poster" id="dPoster"></div>
+      <div class="detail__info">
+        <p class="detail__num" id="dNum"></p>
+        <h3 class="detail__title" id="dTitle"></h3>
+        <p class="detail__tag" id="dTag"></p>
+        <p class="detail__blurb" id="dBlurb"></p>
+        <ol class="detail__bullets" id="dBullets"></ol>
+        <div class="detail__stat"><span id="dStatV"></span><span id="dStatL"></span></div>
+        <figure class="detail__shot" id="dShot" hidden></figure>
+        <div class="detail__actions">
+          <a class="btn btn--ink btn--big" id="dLink" target="_blank" rel="noopener">View project ↗</a>
+          <button type="button" class="btn" id="dRemix">Remix poster</button>
+          <button type="button" class="btn" id="dSave">Download SVG</button>
+          <button type="button" class="btn" id="dPrint">Print</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="keys" id="keys" aria-labelledby="keysH">
+    <h2 id="keysH">Shortcuts</h2>
+    <dl>
+      <dt><kbd>G</kbd></dt><dd>Show the 12-column grid</dd>
+      <dt><kbd>R</kbd></dt><dd>Remix every poster</dd>
+      <dt><kbd>1</kbd>–<kbd>5</kbd></dt><dd>Jump to a section</dd>
+      <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Previous / next poster (when one is open)</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close</dd>
+      <dt><kbd>?</kbd></dt><dd>This list</dd>
+    </dl>
+    <p class="hint">And one word, typed anywhere, that a Swiss designer would type.</p>
+    <form method="dialog"><button class="btn btn--ink">Got it</button></form>
+  </dialog>
+
+  <noscript><p class="noscript">This site sets its type with JavaScript. Please enable it to see the posters.</p></noscript>
+
+  <script src="../shared/data.js"></script>
+  <script src="assets/js/poster.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
