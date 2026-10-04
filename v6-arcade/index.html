@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Matej Popovski · Arcade</title>
+<meta name="description" content="Matej Popovski's portfolio as a tiny pixel-art platformer." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+<style>
+/* Layout: the game fills the first screen (canvas + HUD + dialogue + touch pad); a plain project list follows for people in a hurry. */
+:root {
+  --navy: #1a1c2c; --plum: #5d275d; --red: #b13e53; --orange: #ef7d57; --yellow: #ffcd75; --lime: #a7f070; --green: #38b764;
+  --teal: #257179; --deep: #29366f; --blue: #3b5dc9; --sky: #41a6f6; --cyan: #73eff7; --white: #f4f4f4; --grey: #94b0c2; --slate: #566c86; --ink: #333c57;
+  --px: "Press Start 2P", "Courier New", monospace; --term: "VT323", ui-monospace, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--navy); color: var(--white); font-family: var(--term); font-size: 22px; line-height: 1.3; }
+a { color: var(--yellow); }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+#game { position: relative; height: 100vh; height: 100svh; min-height: 420px; display: grid; place-items: center; overflow: hidden; background: #0f1020; }
+#screen { position: relative; width: min(100vw, calc((100svh - 0px) * 16 / 9)); aspect-ratio: var(--ar, 16 / 9); max-height: 100svh; }
+#cv { width: 100%; height: 100%; display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
+.crt::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px); mix-blend-mode: multiply; }
+.crt #cv { filter: saturate(1.15) contrast(1.05); }
+.crt::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2; box-shadow: inset 0 0 120px rgba(0,0,0,.65); border-radius: 18px; }
+
+.hud { position: absolute; top: 10px; left: 10px; right: 10px; z-index: 5; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; pointer-events: none; font-family: var(--px); font-size: clamp(8px, 1.1vw, 12px); }
+.hud > * { pointer-events: auto; }
+.hud .coins { color: var(--yellow); text-shadow: 2px 2px 0 var(--navy); display: flex; gap: 8px; align-items: center; }
+.hud .btns { display: flex; gap: 6px; }
+.pbtn { font-family: var(--px); font-size: clamp(8px, 1vw, 11px); color: var(--white); background: var(--ink); border: 0; padding: 8px 10px; cursor: pointer; box-shadow: 0 0 0 2px var(--navy), inset -2px -2px 0 rgba(0,0,0,.35), inset 2px 2px 0 rgba(255,255,255,.15); }
+.pbtn:hover { background: var(--blue); }
+.pbtn:active { transform: translateY(2px); }
+
+/* title + overlays */
+.overlay { position: absolute; inset: 0; z-index: 8; display: grid; place-items: center; text-align: center; padding: 16px; }
+.overlay[hidden] { display: none !important; }
+#title { background: radial-gradient(ellipse at center, rgba(26,28,44,.2), rgba(26,28,44,.85)); cursor: pointer; }
+#title h1 { font-family: var(--px); font-size: clamp(22px, 5.4vw, 64px); line-height: 1.15; margin: 0 0 6px; color: var(--yellow); text-shadow: 4px 4px 0 var(--red), 8px 8px 0 var(--navy); letter-spacing: .02em; }
+#title .sub { font-family: var(--px); font-size: clamp(8px, 1.3vw, 14px); color: var(--cyan); margin-bottom: clamp(18px, 4vh, 40px); }
+#title .start { font-family: var(--px); font-size: clamp(12px, 2vw, 22px); color: var(--white); animation: blink 1s steps(1) infinite; }
+#title .keys { margin-top: 22px; font-size: clamp(16px, 2vw, 22px); color: var(--grey); }
+#title .skip { margin-top: 14px; display: inline-block; }
+@keyframes blink { 50% { opacity: 0; } }
+#win { background: rgba(26,28,44,.86); }
+#win h2 { font-family: var(--px); font-size: clamp(18px, 4vw, 44px); color: var(--lime); margin: 0 0 16px; text-shadow: 4px 4px 0 var(--teal); }
+#win p { max-width: 36ch; margin: 0 auto 18px; }
+
+/* dialogue box */
+#dlg { position: absolute; left: 3%; right: 3%; bottom: 4%; z-index: 7; background: var(--navy); border: 4px solid var(--white); box-shadow: 0 0 0 4px var(--navy), 8px 8px 0 4px rgba(0,0,0,.4); padding: clamp(12px, 2vw, 22px) clamp(14px, 2.4vw, 26px); max-height: 70%; overflow: auto; }
+#dlg[hidden] { display: none; }
+#dlg .who { font-family: var(--px); font-size: clamp(10px, 1.4vw, 16px); color: var(--yellow); margin-bottom: 10px; display: flex; justify-content: space-between; gap: 10px; }
+#dlg .who span:last-child { color: var(--grey); }
+#dlg .txt { font-size: clamp(19px, 2.2vw, 26px); min-height: 2.6em; }
+#dlg ul { margin: 6px 0 0; padding: 0; list-style: none; }
+#dlg li::before { content: "▶ "; color: var(--orange); }
+#dlg .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+#dlg .row a { font-family: var(--px); font-size: clamp(9px, 1.2vw, 13px); }
+#dlg .next { font-family: var(--px); font-size: 10px; color: var(--grey); animation: blink 1s steps(1) infinite; }
+
+/* touch pad */
+.pad { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; display: none; justify-content: space-between; padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px)); pointer-events: none; }
+.pad > div { display: flex; gap: 12px; pointer-events: auto; }
+.pad button { width: 62px; height: 62px; border-radius: 50%; border: 0; font-family: var(--px); font-size: 14px; color: var(--white); background: rgba(51,60,87,.82); box-shadow: inset -3px -3px 0 rgba(0,0,0,.35), inset 3px 3px 0 rgba(255,255,255,.12); touch-action: none; -webkit-user-select: none; user-select: none; }
+.pad .a { background: rgba(177,62,83,.88); }
+.pad .b { background: rgba(59,93,201,.88); }
+@media (hover: none), (pointer: coarse) { .pad { display: flex; } }
+
+/* portrait phones: let the game take the top, pad sits below canvas */
+@media (max-aspect-ratio: 1/1) {
+  #game { place-items: center; padding: 64px 0 120px; box-sizing: border-box; }
+  #screen { width: 100vw; }
+  .hud { top: 14px; }
+  .pad { position: absolute; bottom: 0; }
+  #dlg { position: fixed; left: 12px; right: 12px; bottom: 112px; max-height: 50vh; }
+  #title h1 { font-size: 20px; }
+}
+
+/* quick list */
+#list { max-width: 960px; margin: 0 auto; padding: clamp(56px, 10vh, 100px) 16px 80px; }
+#list h2 { font-family: var(--px); font-size: clamp(16px, 3vw, 28px); color: var(--yellow); margin: 0 0 8px; }
+#list .lede { color: var(--grey); margin: 0 0 30px; max-width: 46ch; }
+#list ol { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+#list li { background: var(--ink); padding: 18px; box-shadow: 0 0 0 3px var(--navy), 6px 6px 0 3px rgba(0,0,0,.35); display: grid; gap: 8px; align-content: start; }
+#list li b { font-family: var(--px); font-size: 13px; line-height: 1.4; color: var(--white); }
+#list li .tag { color: var(--cyan); }
+#list li p { margin: 0; color: #d7dde6; }
+#list .about { margin: 40px 0 0; display: grid; gap: 14px; max-width: 64ch; }
+#list .links { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 24px; }
+#list .links a { font-family: var(--px); font-size: 12px; }
+@media (prefers-reduced-motion: reduce) { #title .start, #dlg .next { animation: none; } }
+</style>
+</head>
+<body>
+<section id="game" aria-label="Arcade game">
+  <div id="screen" class="crt">
+    <canvas id="cv" width="320" height="180" aria-label="Pixel world: a robot walking past arcade cabinets, one per project"></canvas>
+    <div class="hud">
+      <div class="coins" aria-live="polite"><span id="coinTxt">¢ 0/0</span><span id="hint" style="color:var(--white)"></span></div>
+      <div class="btns"><button class="pbtn" id="crtBtn" aria-pressed="true">CRT</button><a class="pbtn" href="#list" id="skipBtn" style="text-decoration:none">SKIP</a></div>
+    </div>
+    <div class="overlay" id="title" role="button" tabindex="0" aria-label="Press start">
+      <div>
+        <h1 id="titleName"></h1>
+        <div class="sub" id="titleSub"></div>
+        <div class="start">PRESS START</div>
+        <div class="keys" id="keysHelp">← → move · ↑ / space jump · E talk</div>
+        <a class="skip" href="#list">or skip the game and see the list ↓</a>
+      </div>
+    </div>
+    <div class="overlay" id="win" hidden role="dialog" aria-label="You win">
+      <div><h2>ALL COINS!</h2><p>You collected every skill. That's basically the whole résumé. Thanks for playing.</p>
+      <button class="pbtn" id="winClose">KEEP EXPLORING</button></div>
+    </div>
+    <div id="dlg" hidden role="dialog" aria-live="polite">
+      <div class="who"><span id="dlgWho"></span><span id="dlgTag"></span></div>
+      <div class="txt" id="dlgTxt"></div>
+      <div class="row"><span id="dlgLink"></span><span class="next" id="dlgNext">E / tap to close</span></div>
+    </div>
+  </div>
+  <div class="pad" aria-hidden="true">
+    <div><button data-k="left">◀</button><button data-k="right">▶</button></div>
+    <div><button class="b" data-k="talk">B</button><button class="a" data-k="jump">A</button></div>
+  </div>
+</section>
+
+<section id="list" aria-labelledby="listH">
+  <h2 id="listH">No time to play?</h2>
+  <p class="lede">Here's everything in the arcade, as a plain list.</p>
+  <ol id="projList"></ol>
+  <div class="about" id="aboutTxt"></div>
+  <div class="links" id="links"></div>
+</section>
+
+<script src="../shared/data.js"></script>
+<script>
+(() => {
+  "use strict";
+  const D = window.PORTFOLIO;
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- plain list ---------- */
+  $("#projList").innerHTML = D.projects.map((p) => `<li><b>${esc(p.title)}</b><span class="tag">${esc(p.tag)}</span><p>${esc(p.blurb)}</p><a href="${esc(p.url)}" target="_blank" rel="noopener">GitHub ↗</a></li>`).join("");
+  $("#aboutTxt").innerHTML = `<h2>Player 1: ${esc(D.name)}</h2>` + D.about.map((a) => `<p style="margin:0">${esc(a)}</p>`).join("");
+  $("#links").innerHTML = D.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("");
+  $("#titleName").innerHTML = `${esc(D.first)}<br>${esc(D.last)}`;
+  $("#titleSub").textContent = D.role.toUpperCase();
+
+  /* ---------- palette + sprites ---------- */
+  const C = { a: "#1a1c2c", b: "#5d275d", c: "#b13e53", d: "#ef7d57", e: "#ffcd75", f: "#a7f070", g: "#38b764", h: "#257179", i: "#29366f", j: "#3b5dc9", k: "#41a6f6", l: "#73eff7", m: "#f4f4f4", n: "#94b0c2", o: "#566c86", p: "#333c57" };
+  const ROBOT = [
+    ["....cc......", ".....c......", "..aaaaaaaa..", "..annnnnna..", "..anlnnlna..", "..annnnnna..", "..aaaaaaaa..", ".aammmmmmaa.", "aammddddmmaa", "a.mmddddmm.a", "..mmmmmmmm..", "..aaaaaaaa..", "..aa....aa..", "..aa....aa.."],
+    ["....cc......", ".....c......", "..aaaaaaaa..", "..annnnnna..", "..anlnnlna..", "..annnnnna..", "..aaaaaaaa..", ".aammmmmmaa.", "aammddddmmaa", "a.mmddddmm.a", "..mmmmmmmm..", "..aaaaaaaa..", "...aa..aa...", "..aa....aa.."],
+  ];
+  const DUCK = ["...ee...", "..eeee..", "..eaee.d", "..eeeedd", "eeeeee..", "eeeeeee.", ".eeeeee.", "..eeee.."];
+  const COIN = [["..ee..", ".eeee.", "eemmee", "eemeee", ".eeee.", "..ee.."], ["..e...", ".eee..", ".eme..", ".eee..", ".eee..", "..e..."]];
+  function sprite(rows) {
+    const c = document.createElement("canvas"); c.width = rows[0].length; c.height = rows.length;
+    const g = c.getContext("2d");
+    rows.forEach((r, y) => [...r].forEach((ch, x) => { if (ch !== ".") { g.fillStyle = C[ch]; g.fillRect(x, y, 1, 1); } }));
+    return c;
+  }
+  const robotS = ROBOT.map(sprite), duckS = sprite(DUCK), coinS = COIN.map(sprite);
+
+  /* ---------- world ---------- */
+  let W = 320; const H = 180, GROUND = 150;
+  const cv = $("#cv"), g = cv.getContext("2d");
+  // portrait phones get a narrower, taller viewport so the world fills the screen
+  const fit = () => {
+    const nw = innerWidth < innerHeight ? 208 : 320;
+    if (nw !== W || cv.width !== nw) { W = nw; cv.width = W; $("#screen").style.setProperty("--ar", `${W} / ${H}`); }
+    g.imageSmoothingEnabled = false;
+  };
+  fit(); addEventListener("resize", fit);
+  const marquee = ["c", "e", "k", "g", "b", "d"];
+  const cabinets = D.projects.map((p, i) => ({ x: 300 + i * 260, p, col: C[marquee[i % 6]] }));
+  const WORLD = 300 + D.projects.length * 260 + 380;
+  const duck = { x: 200, y: GROUND - 8 };
+  const platforms = [];
+  cabinets.forEach((c, i) => platforms.push({ x: c.x + 90, y: GROUND - 34 - (i % 2) * 14, w: 46 }));
+  const coins = D.skills.map((s, i) => {
+    const pl = platforms[i % platforms.length];
+    const onPlat = i < platforms.length;
+    return { x: onPlat ? pl.x + pl.w / 2 - 3 : 150 + i * ((WORLD - 300) / D.skills.length), y: onPlat ? pl.y - 12 : GROUND - 16 - (i % 3) * 8, s, got: false };
+  });
+  const secret = { x: -150, found: false };
+  const flag = { x: WORLD - 120 };
+  const city = Array.from({ length: 60 }, (_, i) => ({ x: i * 34 + Math.random() * 10, w: 18 + Math.random() * 20, h: 30 + Math.random() * 60 }));
+  const stars = Array.from({ length: 70 }, () => ({ x: Math.random() * W * 2, y: Math.random() * 90, t: Math.random() * 6 }));
+
+  /* ---------- player ---------- */
+  const pl = { x: 60, y: GROUND - 14, vx: 0, vy: 0, face: 1, ground: true, frame: 0, ft: 0 };
+  const keys = { left: false, right: false, jump: false };
+  let camX = 0, state = "title", talking = null, turbo = false, trail = [], gotCount = 0, tick = 0, won = false;
+  const updateCoins = () => ($("#coinTxt").textContent = `¢ ${gotCount}/${coins.length}`);
+  updateCoins();
+
+  /* ---------- input ---------- */
+  const startGame = () => { if (state !== "title") return; state = "play"; $("#title").hidden = true; cv.focus?.(); };
+  $("#title").addEventListener("click", (e) => { if (!e.target.closest("a")) startGame(); });
+  $("#title").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); startGame(); } });
+  const konami = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"]; let ki = 0;
+  addEventListener("keydown", (e) => {
+    const k = e.key.toLowerCase();
+    ki = k === konami[ki] ? ki + 1 : (k === konami[0] ? 1 : 0);
+    if (ki === konami.length) { ki = 0; turbo = !turbo; toastHint(turbo ? "TURBO MODE!" : "turbo off"); }
+    if (state === "title") { if (["enter", " ", "arrowright", "d"].includes(k) && !e.target.closest("a")) { e.preventDefault(); startGame(); } return; }
+    if (state !== "play" || e.target.closest("#list")) return;
+    if (k === "arrowleft" || k === "a") keys.left = true;
+    if (k === "arrowright" || k === "d") keys.right = true;
+    if (k === "arrowup" || k === "w" || k === " ") { e.preventDefault(); keys.jump = true; }
+    if (k === "e" || k === "enter") { e.preventDefault(); talk(); }
+    if (k === "escape") closeTalk();
+  });
+  addEventListener("keyup", (e) => {
+    const k = e.key.toLowerCase();
+    if (k === "arrowleft" || k === "a") keys.left = false;
+    if (k === "arrowright" || k === "d") keys.right = false;
+    if (k === "arrowup" || k === "w" || k === " ") keys.jump = false;
+  });
+  document.querySelectorAll(".pad button").forEach((b) => {
+    const k = b.dataset.k;
+    const on = (e) => { e.preventDefault(); if (state === "title") return startGame(); if (k === "talk") return talk(); keys[k] = true; };
+    const off = (e) => { e.preventDefault(); if (k !== "talk") keys[k] = false; };
+    b.addEventListener("pointerdown", on); b.addEventListener("pointerup", off); b.addEventListener("pointerleave", off); b.addEventListener("pointercancel", off);
+  });
+  $("#dlg").addEventListener("click", (e) => { if (!e.target.closest("a")) closeTalk(); });
+  $("#crtBtn").addEventListener("click", () => { const on = $("#screen").classList.toggle("crt"); $("#crtBtn").setAttribute("aria-pressed", String(on)); });
+  $("#winClose").addEventListener("click", () => { $("#win").hidden = true; state = "play"; });
+  if (matchMedia("(hover: none), (pointer: coarse)").matches) $("#keysHelp").textContent = "◀ ▶ move · A jump · B talk";
+
+  /* ---------- dialogue ---------- */
+  const jokes = [
+    "Why do programmers prefer dark mode? Because light attracts bugs. Quack.",
+    "I'm a debugging duck. Explain your problem to me and you'll fix it yourself.",
+    "There are 10 kinds of ducks: those who read binary and those who don't.",
+    "Matej once fixed a bug by explaining it to me. I said nothing. Teamwork!",
+  ];
+  let jokeI = 0, typeTimer;
+  function typeOut(el, text, after) {
+    clearInterval(typeTimer);
+    if (reduced) { el.textContent = text; after && after(); return; }
+    let i = 0; el.textContent = "";
+    typeTimer = setInterval(() => { el.textContent = text.slice(0, ++i); if (i >= text.length) { clearInterval(typeTimer); after && after(); } }, 18);
+  }
+  function nearby() {
+    if (Math.abs(pl.x - duck.x) < 22) return { kind: "duck" };
+    for (const c of cabinets) if (Math.abs(pl.x + 6 - (c.x + 14)) < 26) return { kind: "cab", c };
+    if (secret.found && pl.x < -100) return { kind: "secret" };
+    return null;
+  }
+  function talk() {
+    if (talking) return closeTalk();
+    const n = nearby(); if (!n) return;
+    talking = n; keys.left = keys.right = false;
+    const dlg = $("#dlg"); dlg.hidden = false;
+    $("#dlgLink").innerHTML = ""; dlg.querySelector("ul")?.remove();
+    if (n.kind === "duck") { $("#dlgWho").textContent = "DEBUG DUCK"; $("#dlgTag").textContent = "NPC"; typeOut($("#dlgTxt"), jokes[jokeI++ % jokes.length]); }
+    else if (n.kind === "secret") { $("#dlgWho").textContent = "SECRET ROOM"; $("#dlgTag").textContent = "★"; typeOut($("#dlgTxt"), "You found the secret room! Fun fact: this whole game is drawn from tiny text grids, no image files at all."); }
+    else {
+      const p = n.c.p;
+      $("#dlgWho").textContent = p.title.toUpperCase(); $("#dlgTag").textContent = p.tag;
+      typeOut($("#dlgTxt"), p.blurb, () => {
+        const ul = document.createElement("ul"); ul.innerHTML = p.bullets.map((b) => `<li>${esc(b)}</li>`).join("");
+        $("#dlgTxt").after(ul);
+        $("#dlgLink").innerHTML = `<a href="${esc(p.url)}" target="_blank" rel="noopener">▶ PLAY THE CODE ON GITHUB</a>`;
+      });
+    }
+  }
+  function closeTalk() { talking = null; clearInterval(typeTimer); $("#dlg").hidden = true; }
+  let hintT;
+  function toastHint(t) { $("#hint").textContent = t; clearTimeout(hintT); hintT = setTimeout(() => ($("#hint").textContent = ""), 1800); }
+
+  /* ---------- update ---------- */
+  function update() {
+    tick++;
+    if (state !== "play") { camX += 0.4; return; }
+    const acc = turbo ? 0.7 : 0.45, max = turbo ? 3.6 : 2.1;
+    if (!talking) {
+      if (keys.left) { pl.vx -= acc; pl.face = -1; }
+      if (keys.right) { pl.vx += acc; pl.face = 1; }
+      if (keys.jump && pl.ground) { pl.vy = -5.4; pl.ground = false; }
+    }
+    pl.vx *= pl.ground ? 0.8 : 0.9; pl.vx = Math.max(-max, Math.min(max, pl.vx));
+    pl.vy += 0.3; pl.vy = Math.min(pl.vy, 6);
+    const prevY = pl.y;
+    pl.x += pl.vx; pl.y += pl.vy;
+    pl.ground = false;
+    if (pl.y >= GROUND - 14) { pl.y = GROUND - 14; pl.vy = 0; pl.ground = true; }
+    for (const p of platforms) {
+      if (pl.vy >= 0 && prevY + 14 <= p.y + 1 && pl.y + 14 >= p.y && pl.x + 10 > p.x && pl.x + 2 < p.x + p.w) { pl.y = p.y - 14; pl.vy = 0; pl.ground = true; }
+    }
+    pl.x = Math.max(-260, Math.min(WORLD - 20, pl.x));
+    if (pl.x < -60 && !secret.found) { secret.found = true; toastHint("SECRET FOUND!"); }
+    if (Math.abs(pl.vx) > 0.3 && pl.ground) { pl.ft++; if (pl.ft > 7) { pl.ft = 0; pl.frame ^= 1; } } else pl.frame = 0;
+    if (turbo) { trail.push({ x: pl.x, y: pl.y, t: 14 }); }
+    trail.forEach((t) => t.t--); trail = trail.filter((t) => t.t > 0);
+    for (const c of coins) if (!c.got && Math.abs(pl.x + 6 - (c.x + 3)) < 9 && Math.abs(pl.y + 7 - (c.y + 3)) < 11) {
+      c.got = true; gotCount++; updateCoins(); toastHint("+ " + c.s.toUpperCase());
+      if (gotCount === coins.length && !won) { won = true; setTimeout(() => { state = "won"; $("#win").hidden = false; $("#winClose").focus(); }, 500); }
+    }
+    if (talking && !nearby()) closeTalk();
+    const n = nearby();
+    if (!talking && n && tick % 2 === 0) { /* prompt drawn in render */ }
+    const target = pl.x - W * 0.4;
+    camX += (target - camX) * 0.12;
+    camX = Math.max(-280, Math.min(WORLD - W + 20, camX));
+  }
+
+  /* ---------- render ---------- */
+  function px(t, x, y, col, size = 8, align = "left") { g.font = `${size}px "Press Start 2P", monospace`; g.textAlign = align; g.fillStyle = C.a; g.fillText(t, x + 1, y + 1); g.fillStyle = col; g.fillText(t, x, y); }
+  function render() {
+    // sky bands
+    const bands = ["#1a1c2c", "#29366f", "#3b5dc9", "#5d275d", "#b13e53", "#ef7d57"];
+    bands.forEach((c, i) => { g.fillStyle = c; g.fillRect(0, i * 18, W, 18 + 1); });
+    // dither between bands
+    g.fillStyle = "rgba(0,0,0,0)";
+    for (let i = 1; i < bands.length; i++) { g.fillStyle = bands[i - 1]; for (let x = 0; x < W; x += 2) g.fillRect(x + (i % 2), i * 18, 1, 1); }
+    // stars
+    stars.forEach((s) => { const sx = ((s.x - camX * 0.05) % (W * 2) + W * 2) % (W * 2); if ((tick + s.t * 10) % 90 < 80) { g.fillStyle = C.m; g.fillRect(sx, s.y, 1, 1); } });
+    // sun
+    g.fillStyle = C.e; g.beginPath(); g.arc(240 - camX * 0.03, 92, 22, 0, Math.PI * 2); g.fill();
+    g.fillStyle = C.d; for (let y = 92; y < 116; y += 4) g.fillRect(200 - camX * 0.03, y, 80, 2);
+    // city far
+    city.forEach((b) => { const x = ((b.x - camX * 0.25) % 2040 + 2040) % 2040 - 40; if (x > W) return; g.fillStyle = C.b; g.fillRect(x, GROUND - b.h - 6, b.w, b.h + 6); g.fillStyle = C.e; for (let wy = GROUND - b.h; wy < GROUND - 10; wy += 7) for (let wx = x + 3; wx < x + b.w - 3; wx += 6) if ((wx * 7 + wy * 13) % 5 === 0) g.fillRect(wx, wy, 2, 3); });
+    // hills mid
+    g.fillStyle = C.i;
+    for (let x = 0; x <= W; x += 2) { const wx = x + camX * 0.5; const hy = GROUND - 18 - Math.sin(wx / 40) * 8 - Math.sin(wx / 17) * 3; g.fillRect(x, hy, 2, GROUND - hy); }
+    g.save(); g.translate(-Math.round(camX), 0);
+    // secret room
+    g.fillStyle = C.p; g.fillRect(-280, GROUND - 70, 200, 70);
+    g.fillStyle = C.a; g.fillRect(-276, GROUND - 66, 192, 66);
+    if (secret.found) { px("SECRET", -228, GROUND - 48, C.f); g.fillStyle = C.e; g.fillRect(-190, GROUND - 26, 10, 12); g.fillRect(-194, GROUND - 30, 18, 4); g.fillRect(-187, GROUND - 14, 4, 4); }
+    // bush hiding the secret
+    g.fillStyle = C.g; for (let k = 0; k < 4; k++) { g.beginPath(); g.arc(-70 + k * 9, GROUND - 6, 9, 0, Math.PI * 2); g.fill(); }
+    // ground
+    for (let x = Math.floor(camX / 8) * 8 - 8; x < camX + W + 8; x += 8) {
+      g.fillStyle = C.g; g.fillRect(x, GROUND, 8, 3); g.fillStyle = C.h; g.fillRect(x, GROUND + 3, 8, 30);
+      g.fillStyle = C.a; if ((x / 8) % 3 === 0) g.fillRect(x + 2, GROUND + 10, 2, 2); if ((x / 8) % 4 === 1) g.fillRect(x + 5, GROUND + 20, 2, 2);
+      g.fillStyle = C.f; if ((x / 8) % 5 === 0) g.fillRect(x + 3, GROUND - 2, 1, 2);
+    }
+    // start sign
+    g.fillStyle = C.o; g.fillRect(20, GROUND - 30, 3, 30); g.fillStyle = C.n; g.fillRect(4, GROUND - 40, 46, 14); px("START →", 7, GROUND - 30, C.a, 6);
+    // platforms
+    platforms.forEach((p) => { g.fillStyle = C.o; g.fillRect(p.x, p.y, p.w, 6); g.fillStyle = C.n; g.fillRect(p.x, p.y, p.w, 2); g.fillStyle = C.a; for (let x = p.x + 4; x < p.x + p.w; x += 8) g.fillRect(x, p.y + 3, 2, 2); });
+    // cabinets
+    const near = nearby();
+    cabinets.forEach((c, i) => {
+      const x = c.x, y = GROUND - 44;
+      g.fillStyle = C.a; g.fillRect(x - 1, y - 1, 30, 46);
+      g.fillStyle = C.p; g.fillRect(x, y, 28, 44);
+      g.fillStyle = c.col; g.fillRect(x, y, 28, 8);
+      px(String(i + 1), x + 11, y + 7, C.a, 6);
+      g.fillStyle = C.a; g.fillRect(x + 3, y + 11, 22, 16);
+      // screen animation per project
+      g.fillStyle = (tick >> 4) % 2 ? C.l : C.k;
+      const sx = x + 4, sy = y + 12;
+      if (i === 0) { g.fillStyle = C.m; g.fillRect(sx + 3, sy + 3, 6, 9); g.fillRect(sx + 11, sy + 3, 6, 9); g.fillStyle = C.c; g.fillRect(sx + 5, sy + 6, 2, 2); g.fillStyle = C.a; g.fillRect(sx + 13, sy + 6, 2, 2); }
+      else if (i === 1) { ["g", "e", "o", "g", "o"].forEach((cc, k) => { g.fillStyle = C[cc]; g.fillRect(sx + 1 + k * 4, sy + 5, 3, 4); }); }
+      else if (i === 2) { const a = tick / 20; g.fillStyle = C.f; g.fillRect(sx + 9, sy + 6, 3, 3); for (let r = 2; r < 8; r++) g.fillRect(sx + 10 + Math.cos(a) * r, sy + 7 + Math.sin(a) * r * .6, 1, 1); }
+      else if (i === 3) { const t1 = (tick % 120) / 120, t2 = Math.min(1, (tick % 120) / 80); g.fillStyle = C.n; g.fillRect(sx + 1, sy + 3, 18 * t1, 3); g.fillStyle = C.d; g.fillRect(sx + 1, sy + 9, 18 * t2, 3); }
+      else if (i === 4) { g.fillStyle = C.f; [[9, 2], [5, 6], [13, 6], [3, 10], [7, 10], [15, 10]].forEach(([a, b]) => g.fillRect(sx + a, sy + b, 2, 2)); }
+      else { g.fillStyle = (tick >> 3) % 2 ? C.e : C.d; g.fillRect(sx + 8, sy + 3, 5, 6); g.fillRect(sx + 9, sy + 9, 3, 3); }
+      g.fillStyle = C.o; g.fillRect(x + 2, y + 30, 24, 6); g.fillStyle = C.c; g.fillRect(x + 7, y + 31, 3, 3); g.fillStyle = C.e; g.fillRect(x + 17, y + 31, 3, 3);
+      if (near && near.c === c && !talking) { const bob = Math.sin(tick / 6) * 2; g.fillStyle = C.m; g.fillRect(x + 2, y - 18 + bob, 24, 12); g.fillStyle = C.a; g.fillRect(x + 12, y - 6 + bob, 4, 3); px(matchMedia("(pointer: coarse)").matches ? "B" : "E", x + 10, y - 8 + bob, C.a, 8); }
+      if (Math.abs(pl.x - x) < 120) px(c.p.title.length > 14 ? c.p.title.slice(0, 13) + "…" : c.p.title, x + 14, y - 24, C.m, 6, "center");
+    });
+    // duck
+    g.drawImage(duckS, duck.x, duck.y + (Math.floor(tick / 30) % 2));
+    if (near && near.kind === "duck" && !talking) px("?", duck.x + 2, duck.y - 4 + Math.sin(tick / 6) * 2, C.m, 8);
+    // flag
+    g.fillStyle = C.n; g.fillRect(flag.x, GROUND - 60, 2, 60); g.fillStyle = gotCount === coins.length ? C.f : C.c; g.fillRect(flag.x + 2, GROUND - 60, 18, 10);
+    px(gotCount === coins.length ? "YOU WIN" : "GOAL", flag.x - 10, GROUND - 66, C.m, 6);
+    // coins
+    coins.forEach((c) => { if (!c.got) g.drawImage(coinS[(tick >> 3) % 2], c.x, c.y + Math.sin((tick + c.x) / 12) * 1.5); });
+    // trail + robot
+    trail.forEach((t, k) => { g.globalAlpha = t.t / 20; g.fillStyle = [C.c, C.d, C.e, C.f, C.k, C.b][k % 6]; g.fillRect(t.x + 2, t.y + 6, 8, 6); });
+    g.globalAlpha = 1;
+    g.save();
+    if (pl.face < 0) { g.translate(Math.round(pl.x) + 12, 0); g.scale(-1, 1); g.drawImage(robotS[pl.frame], 0, Math.round(pl.y)); }
+    else g.drawImage(robotS[pl.frame], Math.round(pl.x), Math.round(pl.y));
+    g.restore();
+    g.restore();
+    if (state === "play" && pl.x < 120 && pl.x > 20 && !talking) px("← psst, secrets", 8, 40, C.n, 6);
+  }
+
+  /* ---------- loop (fixed timestep) ---------- */
+  let acc = 0, last = performance.now(), visible = true;
+  new IntersectionObserver(([en]) => (visible = en.isIntersecting)).observe($("#game"));
+  function frame(now) {
+    requestAnimationFrame(frame);
+    if (!visible || document.hidden) { last = now; return; }
+    acc += Math.min(now - last, 100); last = now;
+    while (acc >= 1000 / 60) { update(); acc -= 1000 / 60; }
+    render();
+  }
+  (document.fonts ? document.fonts.load('8px "Press Start 2P"') : Promise.resolve()).finally(() => requestAnimationFrame(frame));
+  render();
+})();
+</script>
+</body>
+</html>
