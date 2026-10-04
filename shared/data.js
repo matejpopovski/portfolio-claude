@@ -50,7 +50,7 @@ window.PORTFOLIO = {
       rank: "K", suit: "♥",
       title: "Wordle",
       tag: "Java · Swing",
-      blurb: "Wordle rebuilt in Java Swing: six guesses at a hidden five-letter word on a graphical grid. Play a version of it further down this page.",
+      blurb: "Wordle rebuilt in Java Swing: six guesses at a hidden five-letter word on a graphical grid, with clean event-driven code underneath.",
       bullets: ["Event-driven GUI", "File-based word lists", "Clean OOP structure"],
       url: "https://github.com/matejpopovski/Wordle-Game",
     },

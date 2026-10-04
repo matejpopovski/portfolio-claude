@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Matej Popovski · Galaxy</title>
+<meta name="description" content="Matej Popovski's portfolio as a small solar system. Every project is a planet." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Figtree:wght@400;500;600&family=Martian+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+/* Layout: a fixed 3D scene behind a tall scroll track; each scroll stop moves the camera and swaps one glass HUD card. */
+:root {
+  --void: #0f0c24; --void-2: #1d1440; --peach: #ffb38a; --teal: #5fd3c6; --indigo: #8a7dff; --cream: #fff4e6;
+  --glass: rgba(255,244,230,.07); --glass-line: rgba(255,244,230,.16); --dim: rgba(255,244,230,.62);
+  --display: "Syne", "Trebuchet MS", sans-serif; --body: "Figtree", system-ui, sans-serif; --mono: "Martian Mono", ui-monospace, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: radial-gradient(ellipse at 30% 20%, var(--void-2), var(--void) 70%) fixed, var(--void); color: var(--cream); font-family: var(--body); font-size: 16px; line-height: 1.55; overflow-x: hidden; }
+a { color: var(--peach); }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+#scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+.no-gl #scene { display: none; }
+.no-gl body, body.no-gl { background: radial-gradient(circle at 70% 40%, rgba(255,179,138,.35), transparent 30%), radial-gradient(ellipse at 30% 20%, var(--void-2), var(--void) 70%) fixed; }
+
+/* scroll track */
+#track { position: relative; z-index: 1; pointer-events: none; }
+.stop { height: 100vh; height: 100svh; }
+
+/* top bar */
+.bar { position: fixed; top: 0; left: 0; right: 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px clamp(16px, 3vw, 36px); pointer-events: none; }
+.bar > * { pointer-events: auto; }
+.logo { font-family: var(--display); font-weight: 800; font-size: 18px; letter-spacing: .02em; text-decoration: none; color: var(--cream); }
+.logo span { color: var(--peach); }
+.bar button { white-space: nowrap; font: 500 13px var(--body); color: var(--cream); background: var(--glass); border: 1px solid var(--glass-line); border-radius: 999px; padding: 9px 16px; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.bar button:hover { background: rgba(255,244,230,.14); }
+
+/* stop dots */
+.dots { position: fixed; right: clamp(12px, 2.4vw, 32px); top: 50%; transform: translateY(-50%); z-index: 5; display: grid; gap: 12px; }
+.dots button { width: 12px; height: 12px; padding: 0; border-radius: 50%; border: 1px solid var(--glass-line); background: transparent; cursor: pointer; position: relative; transition: background .3s, transform .3s; }
+.dots button.on { background: var(--peach); border-color: var(--peach); transform: scale(1.3); }
+.dots button span { position: absolute; right: 22px; top: 50%; transform: translateY(-50%); white-space: nowrap; font: 400 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--dim); opacity: 0; transition: opacity .25s; pointer-events: none; }
+.dots button:hover span, .dots button:focus-visible span { opacity: 1; }
+
+/* HUD */
+.hud { position: fixed; z-index: 4; left: clamp(16px, 4vw, 64px); bottom: clamp(16px, 7vh, 72px); width: min(460px, calc(100vw - 32px)); max-height: calc(100vh - 120px); overflow: auto;
+  background: linear-gradient(160deg, rgba(255,244,230,.10), rgba(255,244,230,.03)); border: 1px solid var(--glass-line); border-radius: 22px; padding: clamp(20px, 2.4vw, 30px);
+  backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%); box-shadow: 0 30px 80px -30px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.12);
+  transition: opacity .45s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1); }
+.hud.swap { opacity: 0; transform: translateY(18px) scale(.98); }
+.hud .eyebrow { font: 400 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--teal); display: flex; justify-content: space-between; gap: 10px; }
+.hud h1, .hud h2 { font-family: var(--display); font-weight: 800; line-height: .95; letter-spacing: -0.01em; margin: 12px 0 10px; text-wrap: balance; }
+.hud h1 { font-size: clamp(36px, 4.4vw, 58px); font-weight: 700; }
+.hud h1 span { color: var(--peach); }
+.hud h2 { font-size: clamp(30px, 3.6vw, 46px); }
+.hud p { margin: 0 0 12px; color: var(--dim); }
+.hud .verb { color: var(--cream); font-size: 18px; min-height: 1.6em; }
+.hud ul { margin: 0 0 16px; padding: 0; list-style: none; display: grid; gap: 6px; }
+.hud li { display: flex; gap: 10px; }
+.hud li::before { content: "✦"; color: var(--peach); font-size: 12px; line-height: 1.9; }
+.hud .cta { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 999px; background: var(--peach); color: var(--void); font-weight: 600; text-decoration: none; transition: background .3s, transform .3s; }
+.hud .cta:hover { background: var(--cream); transform: translateY(-2px); }
+.hud .log { display: grid; gap: 14px; }
+.hud .log div { border-left: 1px solid var(--glass-line); padding-left: 14px; }
+.hud .log small { display: block; font: 400 10px var(--mono); color: var(--teal); letter-spacing: .06em; margin-bottom: 4px; }
+.hud .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.hud .chips span { font-size: 13px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--glass-line); color: var(--cream); }
+.hud .links { display: grid; gap: 8px; }
+.hud .links a { display: flex; justify-content: space-between; padding: 12px 16px; border-radius: 14px; background: var(--glass); border: 1px solid var(--glass-line); color: var(--cream); text-decoration: none; font-weight: 500; }
+.hud .links a:hover { border-color: var(--peach); }
+.hint { position: fixed; z-index: 4; left: 50%; bottom: 18px; transform: translateX(-50%); font: 400 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); pointer-events: none; transition: opacity .5s; }
+
+/* all-projects drawer (readable without WebGL) */
+.drawer { position: fixed; inset: 0; z-index: 20; background: rgba(15,12,36,.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: grid; place-items: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity .35s; }
+.drawer.on { opacity: 1; pointer-events: auto; }
+.drawer .box { width: min(760px, 100%); max-height: 86vh; overflow: auto; background: #18123a; border: 1px solid var(--glass-line); border-radius: 22px; padding: clamp(18px, 3vw, 32px); }
+.drawer h2 { font-family: var(--display); font-size: 34px; margin: 0 0 16px; display: flex; justify-content: space-between; align-items: center; }
+.drawer h2 button { font: 400 24px var(--body); color: var(--cream); background: none; border: 0; cursor: pointer; }
+.drawer ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.drawer li { padding: 14px 16px; border: 1px solid var(--glass-line); border-radius: 14px; display: grid; gap: 4px; }
+.drawer li b { font-family: var(--display); font-size: 20px; }
+.drawer li span { color: var(--dim); font-size: 14px; }
+.drawer li .row { display: flex; gap: 14px; flex-wrap: wrap; font-size: 14px; }
+.drawer li button { font: 500 14px var(--body); color: var(--teal); background: none; border: 0; padding: 0; cursor: pointer; }
+
+/* hyperspace flash */
+.flash { position: fixed; inset: 0; z-index: 30; pointer-events: none; background: radial-gradient(circle, #fff, rgba(255,179,138,.6) 40%, transparent 70%); opacity: 0; }
+@media (max-width: 720px) {
+  .hud { left: 12px; right: 12px; width: auto; bottom: 12px; max-height: 52vh; border-radius: 18px; }
+  .dots { right: 8px; gap: 10px; }
+  .dots button span { display: none; }
+  .hint { display: none; }
+  .logo { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .hud { transition: none; } }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+<canvas id="scene" aria-hidden="true"></canvas>
+
+<header class="bar">
+  <a class="logo" href="#s0" id="logo">MATEJ<span>·</span>POPOVSKI</a>
+  <button id="allBtn" aria-haspopup="dialog">All projects</button>
+</header>
+<nav class="dots" id="dots" aria-label="Destinations"></nav>
+
+<aside class="hud" id="hud" aria-live="polite"></aside>
+<div class="hint" id="hint">scroll, swipe or use ← → to travel · click a planet to fly to it</div>
+
+<main id="track"></main>
+
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="All projects">
+  <div class="box"><h2>All projects <button id="drawerClose" aria-label="Close">×</button></h2><ol id="drawerList"></ol></div>
+</div>
+<div class="flash" id="flash"></div>
+
+<script src="../shared/data.js"></script>
+<script>
+(() => {
+  "use strict";
+  const D = window.PORTFOLIO;
+  const $ = (s, el = document) => el.querySelector(s);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mobile = matchMedia("(max-width: 720px)").matches;
+
+  /* ---------- stops ---------- */
+  const stops = [
+    { kind: "intro", label: "The star" },
+    { kind: "log", label: "Mission log" },
+    ...D.projects.map((p, i) => ({ kind: "planet", i, label: p.title })),
+    { kind: "skills", label: "Constellation" },
+    { kind: "contact", label: "Transmit" },
+  ];
+  $("#track").innerHTML = stops.map((_, i) => `<div class="stop" id="s${i}"></div>`).join("");
+  $("#dots").innerHTML = stops.map((s, i) => `<button data-i="${i}" aria-label="${esc(s.label)}"><span>${esc(s.label)}</span></button>`).join("");
+  $("#dots").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) go(+b.dataset.i); });
+  const go = (i) => { i = Math.max(0, Math.min(stops.length - 1, i)); scrollTo({ top: i * innerHeight, behavior: reduced ? "auto" : "smooth" }); };
+
+  /* ---------- HUD ---------- */
+  const hud = $("#hud");
+  let verbTimer;
+  function hudHTML(s) {
+    if (s.kind === "intro") return `<div class="eyebrow"><span>Star · ${esc(D.location)}</span><span>00</span></div>
+      <h1>${esc(D.first.charAt(0) + D.first.slice(1).toLowerCase())}<span>.</span><br>${esc(D.last.charAt(0) + D.last.slice(1).toLowerCase())}</h1>
+      <p>${esc(D.role)}</p><p class="verb" id="verb"></p>
+      <p>Six planets orbit this star. Each one is something I built. Scroll to fly there.</p>`;
+    if (s.kind === "log") return `<div class="eyebrow"><span>Mission log</span><span>01</span></div><h2>Who's flying this thing</h2>
+      <div class="log">${D.about.map((p, i) => `<div><small>Stardate ${2026 + i}.${(i * 37 + 104) % 365}</small>${esc(p)}</div>`).join("")}
+      ${D.facts.map((f) => `<div><small>${esc(f.k)}</small>${esc(f.v)}</div>`).join("")}</div>`;
+    if (s.kind === "planet") {
+      const p = D.projects[s.i];
+      return `<div class="eyebrow"><span>Planet ${String(s.i + 1).padStart(2, "0")} · ${esc(p.tag)}</span><span>${esc(p.rank + p.suit)}</span></div>
+        <h2>${esc(p.title)}</h2><p>${esc(p.blurb)}</p><ul>${p.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
+        <a class="cta" href="${esc(p.url)}" target="_blank" rel="noopener">Land on GitHub ↗</a>`;
+    }
+    if (s.kind === "skills") return `<div class="eyebrow"><span>Constellation</span><span>${D.skills.length} stars</span></div><h2>The tools I navigate by</h2>
+      <div class="chips">${D.skills.map((k) => `<span>${esc(k)}</span>`).join("")}</div>`;
+    return `<div class="eyebrow"><span>Transmit</span><span>∞</span></div><h2>Open a channel</h2><p>That's the whole known universe for now. Want to see the source code of any planet?</p>
+      <div class="links">${D.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener"><span>${esc(l.label)}</span><span>↗</span></a>`).join("")}</div>`;
+  }
+  let cur = -1;
+  function setStop(i) {
+    if (i === cur) return; cur = i;
+    hud.classList.add("swap");
+    $("#dots").querySelectorAll("button").forEach((b, k) => b.classList.toggle("on", k === i));
+    setTimeout(() => {
+      hud.innerHTML = hudHTML(stops[i]); hud.scrollTop = 0; hud.classList.remove("swap");
+      clearInterval(verbTimer);
+      const v = $("#verb");
+      if (v) { let k = 0; const show = () => (v.textContent = "Currently: " + D.verbs[k++ % D.verbs.length] + "."); show(); verbTimer = setInterval(show, 2600); }
+    }, reduced ? 0 : 260);
+    $("#hint").style.opacity = i === 0 ? 1 : 0;
+  }
+  const onScroll = () => setStop(Math.max(0, Math.min(stops.length - 1, Math.round(scrollY / innerHeight))));
+  addEventListener("scroll", onScroll, { passive: true });
+  addEventListener("keydown", (e) => {
+    if (e.target.closest("input")) return;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === "PageDown") { e.preventDefault(); go(cur + 1); }
+    if (e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "PageUp") { e.preventDefault(); go(cur - 1); }
+  });
+
+  /* ---------- drawer ---------- */
+  const drawer = $("#drawer");
+  $("#drawerList").innerHTML = D.projects.map((p, i) => `<li><b>${esc(p.title)}</b><span>${esc(p.tag)} · ${esc(p.blurb)}</span>
+    <div class="row"><a href="${esc(p.url)}" target="_blank" rel="noopener">GitHub ↗</a><button data-i="${i + 2}">Fly there →</button></div></li>`).join("");
+  $("#allBtn").addEventListener("click", () => { drawer.classList.add("on"); $("#drawerClose").focus(); });
+  $("#drawerClose").addEventListener("click", () => drawer.classList.remove("on"));
+  drawer.addEventListener("click", (e) => { if (e.target === drawer) drawer.classList.remove("on"); const b = e.target.closest("button[data-i]"); if (b) { drawer.classList.remove("on"); go(+b.dataset.i); } });
+  addEventListener("keydown", (e) => { if (e.key === "Escape") drawer.classList.remove("on"); });
+
+  onScroll();
+
+  /* ---------- 3D ---------- */
+  if (!window.THREE) { document.body.classList.add("no-gl"); return; }
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: $("#scene"), antialias: true, alpha: true }); }
+  catch (e) { document.body.classList.add("no-gl"); return; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0f0c24, 0.006);
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 2000);
+  const resize = () => { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); };
+  resize(); addEventListener("resize", resize);
+
+  scene.add(new THREE.AmbientLight(0x6b5fd0, 0.55));
+  const sunLight = new THREE.PointLight(0xffd2b0, 2.2, 400, 1.2); scene.add(sunLight);
+
+  // textures
+  const canvasTex = (w, h, draw) => { const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t; };
+  const glowTex = canvasTex(128, 128, (g, w) => { const r = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2); r.addColorStop(0, "rgba(255,255,255,1)"); r.addColorStop(.25, "rgba(255,220,190,.55)"); r.addColorStop(1, "rgba(255,180,140,0)"); g.fillStyle = r; g.fillRect(0, 0, w, w); });
+  const glow = (color, size, opacity = 1) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, transparent: true, opacity, blending: THREE.AdditiveBlending, depthWrite: false })); s.scale.set(size, size, 1); return s; };
+
+  // star "Matej"
+  const star = new THREE.Group(); scene.add(star);
+  const starCore = new THREE.Mesh(new THREE.SphereGeometry(3, 48, 48), new THREE.MeshBasicMaterial({ color: 0xffd9b8 }));
+  star.add(starCore, glow(0xffb38a, 22, .9), glow(0xff7a9a, 40, .35));
+
+  // nebulae + starfield
+  [[0x8a7dff, -180, 40, -260, 420], [0xffb38a, 220, -60, -300, 380], [0x5fd3c6, 40, 120, -420, 520]].forEach(([c, x, y, z, s]) => { const n = glow(c, s, .16); n.position.set(x, y, z); scene.add(n); });
+  const N = mobile ? 1400 : 3600;
+  const sg = new THREE.BufferGeometry(), sp = new Float32Array(N * 3), sc = new Float32Array(N * 3);
+  const palette = [new THREE.Color(0xfff4e6), new THREE.Color(0xffb38a), new THREE.Color(0x5fd3c6), new THREE.Color(0xb8b0ff)];
+  for (let i = 0; i < N; i++) {
+    const r = 120 + Math.random() * 600, th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
+    sp.set([r * Math.sin(ph) * Math.cos(th), r * Math.cos(ph) * 0.6, r * Math.sin(ph) * Math.sin(th)], i * 3);
+    const c = palette[i % 4]; sc.set([c.r, c.g, c.b], i * 3);
+  }
+  sg.setAttribute("position", new THREE.BufferAttribute(sp, 3)); sg.setAttribute("color", new THREE.BufferAttribute(sc, 3));
+  const starfield = new THREE.Points(sg, new THREE.PointsMaterial({ size: 1.6, map: glowTex, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  scene.add(starfield);
+
+  // planets
+  const planetTex = (i) => canvasTex(512, 256, (g, w, h) => {
+    const base = [["#ff9a7a", "#ffcf9e"], ["#5fd3c6", "#c8fff4"], ["#8a7dff", "#d9d4ff"], ["#ffb38a", "#ff7a9a"], ["#9be7a0", "#4c9f8a"], ["#c49bff", "#ffd1f0"]][i % 6];
+    const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, base[0]); gr.addColorStop(1, base[1]); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    if (i === 1) { // wordle tiles
+      const cols = ["#6aaa64", "#c9b458", "#787c7e"]; const s = 32;
+      for (let y = 0; y < h; y += s) for (let x = 0; x < w; x += s) { g.fillStyle = cols[(x / s + y / s * 3) % 3 | 0]; g.globalAlpha = .55; g.fillRect(x + 2, y + 2, s - 4, s - 4); }
+      g.globalAlpha = 1; g.fillStyle = "#fff"; g.font = "bold 22px Syne, sans-serif"; const word = "MATEJROBOTCARDS";
+      for (let y = 0, k = 0; y < h; y += s) for (let x = 0; x < w; x += s, k++) g.fillText(word[k % word.length], x + 9, y + 24);
+      return;
+    }
+    for (let k = 0; k < 26; k++) { g.globalAlpha = .08 + Math.random() * .14; g.fillStyle = Math.random() < .5 ? "#fff" : "#2a1f5c"; const y = Math.random() * h; g.fillRect(0, y, w, 2 + Math.random() * 14); }
+    if (i === 3) { g.globalAlpha = .5; g.fillStyle = "#2a1f5c"; for (let x = 0; x < w; x += 24) for (let y = 0; y < h; y += 24) if (Math.random() < .4) g.fillRect(x, y, 10, 10); }
+    g.globalAlpha = 1;
+  });
+  const suitsTex = canvasTex(512, 64, (g, w, h) => { g.fillStyle = "rgba(255,244,230,.0)"; g.fillRect(0, 0, w, h); g.font = "40px serif"; for (let x = 0, k = 0; x < w; x += 40, k++) { g.fillStyle = k % 2 ? "#ff7a9a" : "#fff4e6"; g.fillText("♠♥♦♣"[k % 4], x + 6, 46); } });
+
+  const planets = D.projects.map((p, i) => {
+    const r = 1.4 + (i % 3) * 0.45;
+    const orbit = 11 + i * 6.5;
+    const grp = new THREE.Group();
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(r, 48, 48), new THREE.MeshStandardMaterial({ map: planetTex(i), roughness: .85, metalness: .05 }));
+    mesh.userData.stop = i + 2;
+    grp.add(mesh);
+    const atmo = glow([0xffb38a, 0x5fd3c6, 0x8a7dff, 0xff7a9a, 0x9be7a0, 0xc49bff][i], r * 5, .35); grp.add(atmo);
+    const extras = [];
+    if (i === 0) { // poker: suit ring
+      const ring = new THREE.Mesh(new THREE.RingGeometry(r * 1.5, r * 2.2, 96, 1), new THREE.MeshBasicMaterial({ map: suitsTex, side: THREE.DoubleSide, transparent: true, opacity: .9 }));
+      const pos = ring.geometry.attributes.position, uv = ring.geometry.attributes.uv, v = new THREE.Vector3();
+      for (let k = 0; k < pos.count; k++) { v.fromBufferAttribute(pos, k); uv.setXY(k, (Math.atan2(v.y, v.x) / (Math.PI * 2) + .5) * 6, v.length() < r * 1.85 ? 0 : 1); }
+      suitsTex.wrapS = THREE.RepeatWrapping; ring.rotation.x = Math.PI / 2.4; grp.add(ring); extras.push((t) => (ring.rotation.z = t * .2));
+    }
+    if (i === 2) { // robotics: rover moon
+      const rover = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.BoxGeometry(.5, .25, .35), new THREE.MeshStandardMaterial({ color: 0xfff4e6 }));
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(.08, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff7a9a })); eye.position.set(.27, .05, 0);
+      rover.add(body, eye, glow(0xff7a9a, 1, .8)); grp.add(rover);
+      extras.push((t) => { rover.position.set(Math.cos(t * 1.4) * r * 1.9, Math.sin(t * .7) * .5, Math.sin(t * 1.4) * r * 1.9); rover.rotation.y = -t * 1.4; });
+    }
+    if (i === 3) { // cpu vs gpu: binary pair racing
+      const a = new THREE.Mesh(new THREE.SphereGeometry(.35, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfff4e6 }));
+      const b = new THREE.Mesh(new THREE.SphereGeometry(.35, 16, 16), new THREE.MeshBasicMaterial({ color: 0xff7a9a }));
+      a.add(glow(0xfff4e6, 2, .6)); b.add(glow(0xff7a9a, 2.4, .8)); grp.add(a, b);
+      extras.push((t) => { a.position.set(Math.cos(t) * r * 2.2, .3, Math.sin(t) * r * 2.2); b.position.set(Math.cos(t * 1.45 + 1) * r * 2.6, -.3, Math.sin(t * 1.45 + 1) * r * 2.6); });
+    }
+    if (i === 4) { // data structures: a tree of moons
+      const pts = [[0, 2.6, 0], [-1.2, 1.9, .4], [1.2, 1.9, -.4], [-1.8, 1.1, .8], [-.6, 1.1, 0], [.6, 1.1, -.2], [1.8, 1.1, -.8]];
+      const edges = [[0, 1], [0, 2], [1, 3], [1, 4], [2, 5], [2, 6]];
+      const tree = new THREE.Group(); tree.position.y = r * .3;
+      pts.forEach((q) => { const m = new THREE.Mesh(new THREE.SphereGeometry(.13, 10, 10), new THREE.MeshBasicMaterial({ color: 0xfff4e6 })); m.position.set(...q.map((x) => x * r * .7)); tree.add(m); });
+      const lg = new THREE.BufferGeometry().setFromPoints(edges.flatMap(([u, v]) => [new THREE.Vector3(...pts[u].map((x) => x * r * .7)), new THREE.Vector3(...pts[v].map((x) => x * r * .7))]));
+      tree.add(new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0x5fd3c6, transparent: true, opacity: .7 })));
+      grp.add(tree); extras.push((t) => (tree.rotation.y = t * .5));
+    }
+    if (i === 5) { // AI: wireframe thought-cage
+      const cage = new THREE.Mesh(new THREE.IcosahedronGeometry(r * 1.6, 1), new THREE.MeshBasicMaterial({ color: 0xc49bff, wireframe: true, transparent: true, opacity: .35 }));
+      grp.add(cage); extras.push((t) => { cage.rotation.y = t * .3; cage.rotation.x = t * .2; });
+    }
+    if (i === 1) { const moon = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, .5), new THREE.MeshStandardMaterial({ color: 0x6aaa64 })); grp.add(moon); extras.push((t) => { moon.position.set(Math.cos(t * 1.2) * r * 2, 0, Math.sin(t * 1.2) * r * 2); moon.rotation.set(t, t * 1.3, 0); }); }
+    scene.add(grp);
+    // orbit line
+    const og = new THREE.BufferGeometry().setFromPoints(Array.from({ length: 160 }, (_, k) => new THREE.Vector3(Math.cos(k / 160 * Math.PI * 2) * orbit, 0, Math.sin(k / 160 * Math.PI * 2) * orbit)));
+    const orbitLine = new THREE.LineLoop(og, new THREE.LineBasicMaterial({ color: 0xfff4e6, transparent: true, opacity: .08 }));
+    scene.add(orbitLine);
+    return { grp, mesh, r, orbit, ang: i * 1.9 + .6, speed: .05 / (1 + i * .35), extras, tilt: (i % 2 ? 1 : -1) * .06 * i };
+  });
+  planets.forEach((p) => { p.grp.position.y = 0; });
+
+  // constellation of skills
+  const constel = new THREE.Group(); constel.position.set(-70, 46, -90); scene.add(constel);
+  const cpts = D.skills.map((_, k) => { const a = k / D.skills.length * Math.PI * 2; const rr = 10 + (k % 3) * 4; return new THREE.Vector3(Math.cos(a) * rr + (Math.random() - .5) * 4, Math.sin(a * 2) * 6 + (Math.random() - .5) * 4, Math.sin(a) * rr * .5); });
+  cpts.forEach((v, k) => { const s = glow(k % 3 ? 0xfff4e6 : 0x5fd3c6, k % 4 ? 2.4 : 3.6, .95); s.position.copy(v); constel.add(s); });
+  const cl = new THREE.BufferGeometry().setFromPoints(cpts.flatMap((v, k) => [v, cpts[(k + 1) % cpts.length]]));
+  const cLine = new THREE.LineSegments(cl, new THREE.LineBasicMaterial({ color: 0x5fd3c6, transparent: true, opacity: 0 }));
+  constel.add(cLine);
+
+  /* ---------- camera choreography ---------- */
+  const camPos = new THREE.Vector3(0, 8, 46), camLook = new THREE.Vector3();
+  const tPos = new THREE.Vector3(), tLook = new THREE.Vector3(), tmp = new THREE.Vector3();
+  function target() {
+    const s = stops[cur] || stops[0];
+    if (s.kind === "intro") { tPos.set(mobile ? 0 : -6, mobile ? 10 : 6, mobile ? 40 : 28); tLook.set(mobile ? 0 : -8, mobile ? -4 : 0, 0); }
+    else if (s.kind === "log") { tPos.set(0, 70, 24); tLook.set(0, 0, 0); }
+    else if (s.kind === "planet") {
+      const p = planets[s.i]; const pp = p.grp.position;
+      tmp.copy(pp).normalize();
+      const side = new THREE.Vector3(-tmp.z, 0, tmp.x);
+      tPos.copy(pp).addScaledVector(tmp, p.r * (mobile ? 7 : 3.4)).addScaledVector(side, mobile ? 0 : p.r * 2.4).add(new THREE.Vector3(0, p.r * (mobile ? 1.2 : 1.1), 0));
+      tLook.copy(pp).addScaledVector(side, mobile ? 0 : -p.r * 2.6).add(new THREE.Vector3(0, mobile ? -p.r * 2.6 : 0, 0));
+    }
+    else if (s.kind === "skills") { tPos.copy(constel.position).add(new THREE.Vector3(mobile ? 0 : 8, mobile ? -6 : 0, mobile ? 52 : 36)); tLook.copy(constel.position).add(new THREE.Vector3(mobile ? 0 : 6, mobile ? -10 : 0, 0)); }
+    else { tPos.set(0, 140, 220); tLook.set(0, 0, 0); }
+  }
+
+  // picking
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  let starClicks = 0, starT, supernova = 0;
+  $("#scene").addEventListener("click", (e) => {
+    ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObjects([starCore, ...planets.map((p) => p.mesh)])[0];
+    if (!hit) return;
+    if (hit.object === starCore) { starClicks++; clearTimeout(starT); starT = setTimeout(() => (starClicks = 0), 2000); if (starClicks >= 5) { starClicks = 0; supernova = 1; } else go(0); }
+    else go(hit.object.userData.stop);
+  });
+  $("#scene").addEventListener("pointermove", (e) => {
+    ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ndc, camera);
+    $("#scene").style.cursor = ray.intersectObjects([starCore, ...planets.map((p) => p.mesh)]).length ? "pointer" : "default";
+  });
+  // canvas must receive clicks but let the page scroll through it
+  $("#scene").style.pointerEvents = "auto";
+
+  // konami → hyperspace
+  const seq = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"]; let ki = 0, hyper = 0;
+  addEventListener("keydown", (e) => { ki = e.key.toLowerCase() === seq[ki].toLowerCase() ? ki + 1 : 0; if (ki === seq.length) { ki = 0; hyper = 1; } });
+
+  let running = true;
+  document.addEventListener("visibilitychange", () => (running = !document.hidden));
+  const clock = new THREE.Clock(); let t = 0;
+  (function frame() {
+    requestAnimationFrame(frame);
+    if (!running) return;
+    const dt = Math.min(clock.getDelta(), .05); t += reduced ? 0 : dt;
+    planets.forEach((p) => {
+      p.ang += reduced ? 0 : p.speed * dt * (stops[cur]?.kind === "planet" ? .35 : 1);
+      p.grp.position.set(Math.cos(p.ang) * p.orbit, Math.sin(p.ang * 2) * p.tilt * p.orbit, Math.sin(p.ang) * p.orbit);
+      p.mesh.rotation.y += dt * .25; p.extras.forEach((f) => f(t));
+    });
+    starCore.scale.setScalar(1 + Math.sin(t * 2) * .03);
+    starfield.rotation.y += dt * .004;
+    cLine.material.opacity += ((stops[cur]?.kind === "skills" ? .55 : .08) - cLine.material.opacity) * .05;
+    if (supernova > 0) {
+      supernova += dt; const k = supernova;
+      star.scale.setScalar(1 + Math.sin(Math.min(k, 3) / 3 * Math.PI) * 6);
+      $("#flash").style.opacity = String(Math.max(0, Math.sin(Math.min(k, 1.5) / 1.5 * Math.PI)) * .85);
+      if (k > 3) { supernova = 0; star.scale.setScalar(1); $("#flash").style.opacity = 0; }
+    }
+    if (hyper > 0) {
+      hyper += dt; starfield.scale.z = 1 + Math.sin(Math.min(hyper, 2) / 2 * Math.PI) * 14; camera.fov = 55 + Math.sin(Math.min(hyper, 2) / 2 * Math.PI) * 40; camera.updateProjectionMatrix();
+      if (hyper > 2) { hyper = 0; starfield.scale.z = 1; camera.fov = 55; camera.updateProjectionMatrix(); }
+    }
+    target();
+    const ease = reduced ? 1 : 1 - Math.pow(.0015, dt);
+    camPos.lerp(tPos, ease); camLook.lerp(tLook, ease);
+    camera.position.copy(camPos); camera.lookAt(camLook);
+    renderer.render(scene, camera);
+  })();
+})();
+</script>
+</body>
+</html>
