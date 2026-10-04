@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Matej Popovski · Index</title>
+<meta name="description" content="Matej Popovski: computer science, robotics, machine learning and games." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* Layout: a strict 12-column poster grid; giant variable type up top, a numbered project index, a pinned horizontal strip, a type specimen of skills. */
+:root {
+  --paper: #f2f0ea; --ink: #111110; --blue: #2340ff; --grey: #8b8980; --rule: rgba(17,17,16,.16);
+  --sans: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --mono: "DM Mono", ui-monospace, monospace;
+  --gut: clamp(16px, 2.2vw, 32px); --pad: clamp(16px, 3vw, 44px);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 18px; line-height: 1.45; overflow-x: hidden; font-variation-settings: "opsz" 18; }
+a { color: inherit; }
+::selection { background: var(--blue); color: var(--paper); }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.mono { font-family: var(--mono); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+.wrap { padding: 0 var(--pad); }
+.grid12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gut); }
+
+/* grid overlay (press G) */
+#gridOverlay { position: fixed; inset: 0; z-index: 90; pointer-events: none; padding: 0 var(--pad); opacity: 0; transition: opacity .3s; }
+#gridOverlay.on { opacity: 1; }
+#gridOverlay div { height: 100%; }
+#gridOverlay span { background: rgba(35,64,255,.07); border-left: 1px solid rgba(35,64,255,.25); border-right: 1px solid rgba(35,64,255,.25); }
+
+/* header */
+header.top { position: sticky; top: 0; z-index: 50; background: var(--paper); border-bottom: 1px solid var(--ink); padding-block: 12px; }
+header.top .grid12 > * { min-width: 0; }
+header.top nav { display: flex; gap: 18px; justify-content: flex-end; }
+header.top a { text-decoration: none; }
+header.top a:hover { color: var(--blue); }
+.h-name { grid-column: 1 / 4; font-weight: 700; }
+.h-role { grid-column: 4 / 8; color: var(--grey); }
+.h-time { grid-column: 8 / 10; color: var(--grey); }
+.h-nav { grid-column: 10 / 13; }
+
+/* hero */
+.hero { position: relative; padding-top: clamp(20px, 4vh, 40px); padding-bottom: clamp(40px, 8vh, 90px); overflow: hidden; }
+.giant { margin: 0; font-weight: 800; line-height: .78; letter-spacing: -0.035em; text-transform: uppercase; font-size: clamp(64px, 17.4vw, 300px); position: relative; z-index: 2; user-select: none; -webkit-user-select: none; }
+.giant .line { display: block; white-space: nowrap; }
+.giant .ch { display: inline-block; font-variation-settings: "wdth" var(--w, 100), "opsz" 96; font-weight: var(--wg, 800); transition: color .2s; cursor: grab; touch-action: none; will-change: transform; }
+.giant .ch.drag { cursor: grabbing; color: var(--blue); }
+.giant .line2 { color: transparent; -webkit-text-stroke: 2px var(--ink); }
+.giant .line2 .ch:hover { color: var(--ink); }
+.disc { position: absolute; z-index: 1; width: clamp(110px, 30vw, 500px); aspect-ratio: 1; border-radius: 50%; background: var(--blue); right: 5vw; top: 2%; mix-blend-mode: multiply; will-change: transform; }
+.hero-meta { margin-top: clamp(28px, 5vh, 56px); align-items: end; position: relative; z-index: 2; }
+.hero-meta .verb { grid-column: 1 / 8; font-size: clamp(26px, 3.2vw, 46px); line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; }
+.hero-meta .verb b { color: var(--blue); font-weight: 700; }
+.hero-meta .hint { grid-column: 9 / 13; color: var(--grey); }
+
+/* section heads */
+section { padding-block: clamp(70px, 12vh, 140px); }
+.sec-head { border-top: 2px solid var(--ink); padding-top: 12px; margin-bottom: clamp(32px, 6vh, 64px); }
+.sec-head .num { grid-column: 1 / 2; color: var(--blue); }
+.sec-head .lab { grid-column: 2 / 7; }
+.sec-head .note { grid-column: 7 / 13; color: var(--grey); text-align: right; }
+
+/* about */
+.about .lead { grid-column: 1 / 9; font-size: clamp(30px, 4.2vw, 64px); line-height: 1.02; letter-spacing: -0.02em; font-weight: 500; margin: 0 0 40px; text-wrap: balance; }
+.about .lead em { font-style: normal; color: var(--blue); }
+.about .body { grid-column: 5 / 11; columns: 2; column-gap: var(--gut); font-size: 17px; color: #2b2a27; }
+.about .body p { margin: 0 0 1em; break-inside: avoid; }
+
+/* index */
+.index { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
+.row { position: relative; border-bottom: 1px solid var(--rule); }
+.row > a, .row > button { display: grid; grid-template-columns: repeat(12, minmax(0,1fr)); column-gap: var(--gut); align-items: baseline; width: 100%; padding: 18px 0; text-decoration: none; color: inherit; background: none; border: 0; font: inherit; text-align: left; cursor: pointer; transition: color .25s, padding .4s cubic-bezier(.22,1,.36,1); }
+.row .n { grid-column: 1 / 2; }
+.row .t { grid-column: 2 / 8; font-size: clamp(30px, 4.6vw, 72px); line-height: .95; font-weight: 700; letter-spacing: -0.03em; font-variation-settings: "wdth" 100, "opsz" 96; transition: font-variation-settings .5s cubic-bezier(.22,1,.36,1), letter-spacing .5s; }
+.row .g { grid-column: 8 / 11; color: var(--grey); }
+.row .go { grid-column: 12 / 13; text-align: right; font-size: 28px; transition: transform .4s cubic-bezier(.22,1,.36,1); }
+.row:hover > a, .row:focus-within > a { color: var(--blue); }
+.row:hover .t { font-variation-settings: "wdth" 75, "opsz" 96; letter-spacing: -0.01em; }
+.row:hover .go { transform: translate(4px,-4px); }
+.row .more { display: none; }
+#poster { position: fixed; left: 0; top: 0; z-index: 60; width: 300px; height: 400px; pointer-events: none; opacity: 0; transform: translate(-50%, -50%) scale(.9) rotate(-3deg); transition: opacity .25s, transform .4s cubic-bezier(.22,1,.36,1); box-shadow: 0 30px 60px -20px rgba(0,0,0,.35); }
+#poster.on { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-3deg); }
+#poster canvas { width: 100%; height: 100%; display: block; }
+
+/* horizontal strip */
+.strip { height: 300vh; padding: 0; position: relative; }
+.strip .stick { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; align-items: center; }
+.strip .track { display: flex; gap: var(--gut); padding: 0 var(--pad); will-change: transform; }
+.panel { flex: 0 0 auto; width: min(78vw, 820px); height: min(70vh, 560px); border: 2px solid var(--ink); padding: clamp(18px, 3vw, 36px); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+.panel:nth-child(2n) { background: var(--ink); color: var(--paper); }
+.panel:nth-child(3n) { background: var(--blue); color: var(--paper); border-color: var(--blue); }
+.panel .k { font-family: var(--mono); font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+.panel .v { font-size: clamp(54px, 9vw, 150px); line-height: .85; font-weight: 800; letter-spacing: -0.04em; font-variation-settings: "wdth" 75, "opsz" 96; text-wrap: balance; }
+.panel .shape { position: absolute; right: -10%; bottom: -20%; width: 55%; aspect-ratio: 1; border-radius: 50%; border: 2px solid currentColor; opacity: .5; }
+.panel.intro .v { font-size: clamp(40px, 6vw, 96px); }
+
+/* specimen */
+.spec { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); border-top: 1px solid var(--ink); border-left: 1px solid var(--ink); }
+.cellS { border-right: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 16px; min-height: 170px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; transition: background .3s, color .3s; min-width: 0; }
+.cellS .w { font-size: clamp(26px, 2.8vw, 44px); line-height: .95; letter-spacing: -0.02em; overflow-wrap: anywhere; transition: font-variation-settings .6s cubic-bezier(.22,1,.36,1), font-weight .6s; }
+.cellS .meta { display: flex; justify-content: space-between; color: var(--grey); }
+.cellS:hover { background: var(--ink); color: var(--paper); }
+.cellS:hover .w { font-weight: 200 !important; font-variation-settings: "wdth" 100, "opsz" 96 !important; }
+
+/* contact */
+.contact .big { display: block; font-size: clamp(60px, 15vw, 260px); line-height: .8; font-weight: 800; letter-spacing: -0.05em; text-decoration: none; text-transform: uppercase; font-variation-settings: "wdth" 75, "opsz" 96; transition: color .3s, font-variation-settings .6s cubic-bezier(.22,1,.36,1); }
+.contact .big:hover { color: var(--blue); font-variation-settings: "wdth" 100, "opsz" 96; }
+.contact .links { margin-top: 40px; }
+.contact .links a { grid-column: span 3; display: flex; justify-content: space-between; border-top: 2px solid var(--ink); padding-top: 10px; text-decoration: none; font-weight: 600; font-size: 22px; }
+.contact .links a:hover { color: var(--blue); }
+footer.bot { border-top: 1px solid var(--ink); padding-block: 14px 24px; color: var(--grey); }
+footer.bot .grid12 > :nth-child(1) { grid-column: 1 / 5; }
+footer.bot .grid12 > :nth-child(2) { grid-column: 5 / 10; }
+footer.bot .grid12 > :nth-child(3) { grid-column: 10 / 13; text-align: right; }
+.kbd { display: inline-block; border: 1px solid currentColor; padding: 0 5px; border-radius: 3px; }
+
+/* poster generator mode (press P) */
+#gen { position: fixed; inset: 0; z-index: 100; background: var(--paper); display: none; place-items: center; padding: 16px; }
+#gen.on { display: grid; }
+#gen canvas { height: min(84vh, 140vw); aspect-ratio: 3 / 4; max-width: 100%; box-shadow: 0 30px 80px -30px rgba(0,0,0,.4); }
+#gen .bar { position: absolute; left: 16px; right: 16px; bottom: 14px; display: flex; justify-content: space-between; gap: 12px; color: var(--grey); }
+
+/* reveal */
+.rv { opacity: 0; transform: translateY(30px); transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); }
+.rv.in { opacity: 1; transform: none; }
+
+@media (max-width: 860px) {
+  .h-role, .h-time { display: none; }
+  .h-name { grid-column: 1 / 7; } .h-nav { grid-column: 7 / 13; }
+  header.top nav { gap: 12px; }
+  .hero-meta .verb { grid-column: 1 / 13; }
+  .disc { width: 26vw; top: 6px; right: 12px; }
+  .hero-meta .hint { grid-column: 1 / 13; margin-top: 16px; }
+  .sec-head .lab { grid-column: 2 / 13; } .sec-head .note { display: none; }
+  .about .lead, .about .body { grid-column: 1 / 13; }
+  .about .body { columns: 1; }
+  .row .n { grid-column: 1 / 3; } .row .t { grid-column: 3 / 12; } .row .g { grid-column: 3 / 12; margin-top: 6px; } .row .go { grid-column: 12 / 13; grid-row: 1; }
+  .row .more { grid-column: 3 / 13; }
+  .row.open .more { display: block; padding: 0 0 20px; }
+  .row.open .more canvas { width: 100%; max-width: 320px; aspect-ratio: 3 / 4; display: block; margin: 0 0 14px; }
+  .row .more p { margin: 0 0 12px; font-size: 16px; }
+  .row .more a { color: var(--blue); font-weight: 600; }
+  .spec { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .contact .links a { grid-column: span 12; margin-top: 10px; }
+  footer.bot .grid12 > * { grid-column: 1 / 13 !important; text-align: left !important; margin-top: 4px; }
+  .strip { height: auto; }
+  .strip .stick { position: static; height: auto; overflow: visible; }
+  .strip .track { flex-direction: column; transform: none !important; }
+  .panel { width: 100%; height: auto; min-height: 260px; gap: 30px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .rv { opacity: 1; transform: none; } * { transition-duration: .001ms !important; } }
+</style>
+</head>
+<body>
+<div id="gridOverlay" aria-hidden="true"><div class="grid12">
+  <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+</div></div>
+
+<header class="top wrap">
+  <div class="grid12 mono">
+    <a href="#top" class="h-name" id="hName"></a>
+    <span class="h-role" id="hRole"></span>
+    <span class="h-time" id="hTime"></span>
+    <nav class="h-nav" aria-label="Sections"><a href="#index">Index</a><a href="#about">About</a><a href="#contact">Contact</a></nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero wrap" style="padding-top:clamp(20px,4vh,40px)" aria-label="Intro">
+    <div class="disc" id="disc" aria-hidden="true"></div>
+    <h1 class="giant" id="giant" aria-label=""></h1>
+    <div class="grid12 hero-meta">
+      <p class="verb" id="verb" style="margin:0"></p>
+      <p class="hint mono" style="margin:0">Letters react to your cursor. Grab one and throw it. <span class="kbd">G</span> shows the grid, <span class="kbd">P</span> makes a poster.</p>
+    </div>
+  </section>
+
+  <section class="about wrap" id="about">
+    <div class="sec-head grid12 mono"><span class="num">01</span><span class="lab">About</span><span class="note" id="loc"></span></div>
+    <div class="grid12">
+      <p class="lead rv">I build software that <em>leaves the screen</em>: robots that map rooms, games you can hold, models that train faster on the right silicon.</p>
+      <div class="body rv" id="aboutBody"></div>
+    </div>
+  </section>
+
+  <section class="wrap" id="index" style="padding-bottom:40px">
+    <div class="sec-head grid12 mono"><span class="num">02</span><span class="lab">Index of projects</span><span class="note">Hover a row for its poster</span></div>
+    <ol class="index" id="list"></ol>
+  </section>
+
+  <section class="strip" aria-label="Facts">
+    <div class="stick"><div class="track" id="track"></div></div>
+  </section>
+
+  <section class="wrap" id="skills">
+    <div class="sec-head grid12 mono"><span class="num">03</span><span class="lab">Specimen: things I use</span><span class="note">Bricolage Grotesque, variable</span></div>
+    <div class="spec" id="spec"></div>
+  </section>
+
+  <section class="contact wrap" id="contact">
+    <div class="sec-head grid12 mono"><span class="num">04</span><span class="lab">Contact</span><span class="note">Madison, Wisconsin</span></div>
+    <a class="big" href="https://github.com/matejpopovski" target="_blank" rel="noopener">Say<br />hello ↗</a>
+    <div class="grid12 links" id="links"></div>
+  </section>
+</main>
+
+<footer class="bot wrap mono"><div class="grid12">
+  <span>© <span id="yr"></span> Matej Popovski</span>
+  <span>Set in Bricolage Grotesque and DM Mono on a 12-column grid.</span>
+  <span>Press <span class="kbd">G</span> / <span class="kbd">P</span></span>
+</div></footer>
+
+<div id="poster" aria-hidden="true"><canvas width="600" height="800"></canvas></div>
+<div id="gen" role="dialog" aria-label="Poster generator"><canvas width="900" height="1200"></canvas>
+  <div class="bar mono"><span>Poster generator. Click or press space for a new one.</span><span>Esc to close</span></div></div>
+
+<script src="../shared/data.js"></script>
+<script>
+(() => {
+  "use strict";
+  const D = window.PORTFOLIO;
+  const $ = (s, el = document) => el.querySelector(s);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const small = () => matchMedia("(max-width: 860px)").matches;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  /* ---------- content ---------- */
+  $("#hName").textContent = D.name;
+  $("#hRole").textContent = D.role;
+  $("#loc").textContent = D.location;
+  $("#yr").textContent = new Date().getFullYear();
+  $("#aboutBody").innerHTML = D.about.map((p) => `<p>${esc(p)}</p>`).join("");
+  const fmt = new Intl.DateTimeFormat("en-GB", { timeZone: "America/Chicago", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const t = () => ($("#hTime").textContent = "Madison " + fmt.format(new Date())); t(); setInterval(t, 1000);
+
+  // rotating verb
+  (() => {
+    const el = $("#verb"); let i = 0;
+    const show = () => { el.innerHTML = `Matej <b>${esc(D.verbs[i % D.verbs.length])}</b>.`; i++; };
+    show(); setInterval(show, 2600);
+  })();
+
+  /* ---------- giant kinetic name ---------- */
+  const giant = $("#giant");
+  giant.setAttribute("aria-label", D.name);
+  giant.innerHTML = [D.first, D.last].map((w, li) => `<span class="line line${li + 1}" aria-hidden="true">${[...w].map((c) => `<span class="ch">${c}</span>`).join("")}</span>`).join("");
+  const chars = [...giant.querySelectorAll(".ch")].map((el) => ({ el, x: 0, y: 0, vx: 0, vy: 0, drag: false, w: 100, wg: 800 }));
+  const mouse = { x: -1e4, y: -1e4 };
+  addEventListener("pointermove", (e) => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
+  let lastY = scrollY, vel = 0;
+  chars.forEach((c) => {
+    c.el.addEventListener("pointerdown", (e) => {
+      e.preventDefault(); c.drag = true; c.el.classList.add("drag"); c.el.setPointerCapture(e.pointerId);
+      const sx = e.clientX - c.x, sy = e.clientY - c.y; let lx = e.clientX, ly = e.clientY;
+      const mv = (ev) => { c.vx = ev.clientX - lx; c.vy = ev.clientY - ly; lx = ev.clientX; ly = ev.clientY; c.x = ev.clientX - sx; c.y = ev.clientY - sy; };
+      const up = () => { c.drag = false; c.el.classList.remove("drag"); c.el.removeEventListener("pointermove", mv); c.el.removeEventListener("pointerup", up); };
+      c.el.addEventListener("pointermove", mv); c.el.addEventListener("pointerup", up);
+    });
+  });
+  let heroVisible = true;
+  new IntersectionObserver(([en]) => (heroVisible = en.isIntersecting)).observe(giant);
+  (function loop() {
+    requestAnimationFrame(loop);
+    const dy = scrollY - lastY; lastY = scrollY; vel += (dy - vel) * 0.12;
+    if (!heroVisible) return;
+    for (const c of chars) {
+      if (!c.drag) {
+        c.vx += -c.x * 0.08; c.vy += -c.y * 0.08; c.vx *= 0.82; c.vy *= 0.82; c.x += c.vx; c.y += c.vy;
+      }
+      const r = c.el.getBoundingClientRect();
+      const cx = r.left + r.width / 2 - c.x, cy = r.top + r.height / 2 - c.y;
+      const d = Math.hypot(mouse.x - cx, mouse.y - cy);
+      const near = reduced ? 0 : clamp(1 - d / 380, 0, 1);
+      const squeeze = reduced ? 0 : clamp(Math.abs(vel) / 30, 0, 1);
+      const tw = 100 - near * 25 - squeeze * 25, tg = 800 - near * 520;
+      c.w += (tw - c.w) * 0.15; c.wg += (tg - c.wg) * 0.15;
+      c.el.style.setProperty("--w", c.w.toFixed(1));
+      c.el.style.setProperty("--wg", Math.round(c.wg));
+      c.el.style.transform = `translate(${c.x.toFixed(1)}px, ${c.y.toFixed(1)}px) skewX(${clamp(-vel * 0.4, -14, 14).toFixed(1)}deg)`;
+    }
+    $("#disc").style.transform = `translate(${(-scrollY * 0.25).toFixed(1)}px, ${(scrollY * 0.45).toFixed(1)}px) scale(${1 + scrollY / 3000})`;
+  })();
+
+  /* ---------- generative Swiss posters ---------- */
+  function rng(seed) { let s = seed >>> 0 || 1; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+  const hash = (str) => [...str].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+  function poster(cv, p, seed) {
+    const ctx = cv.getContext("2d"), W = cv.width, H = cv.height, r = rng(seed);
+    const P = "#f2f0ea", K = "#111110", B = "#2340ff";
+    const bg = [P, P, K, B][Math.floor(r() * 4)], fg = bg === P ? K : P, ac = bg === B ? K : B;
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    const kind = Math.floor(r() * 4), u = W / 12;
+    ctx.save();
+    if (kind === 0) { // concentric circles
+      const cx = u * (3 + r() * 6), cy = H * (0.25 + r() * 0.3);
+      for (let i = 9; i > 0; i--) { ctx.beginPath(); ctx.arc(cx, cy, i * u * 0.75, 0, Math.PI * 2); ctx.fillStyle = i % 2 ? ac : bg; ctx.fill(); }
+    } else if (kind === 1) { // grid of dots, some big
+      for (let x = 0; x < 12; x++) for (let y = 0; y < 10; y++) { const big = r() < 0.12; ctx.beginPath(); ctx.arc(u * (x + 0.5), u * (y + 0.8), big ? u * 0.48 : u * 0.1, 0, Math.PI * 2); ctx.fillStyle = big ? ac : fg; ctx.fill(); }
+    } else if (kind === 2) { // diagonals
+      ctx.translate(W / 2, H * 0.4); ctx.rotate(-Math.PI / 4 + (r() - 0.5) * 0.4);
+      for (let i = -12; i < 12; i++) { ctx.fillStyle = i % 3 === 0 ? ac : fg; ctx.fillRect(i * u * 0.9, -H, u * (i % 3 === 0 ? 0.6 : 0.12), H * 2); }
+    } else { // quarter circles on grid
+      for (let x = 0; x < 4; x++) for (let y = 0; y < 4; y++) { ctx.beginPath(); const s = u * 3, ox = x * s, oy = y * s * 0.9; const q = Math.floor(r() * 4); const cx = ox + (q % 2) * s, cy = oy + (q > 1 ? s : 0); ctx.moveTo(cx, cy); ctx.arc(cx, cy, s, 0, Math.PI * 2); ctx.fillStyle = (x + y) % 2 ? ac : fg; ctx.globalAlpha = 0.9; ctx.fill(); }
+    }
+    ctx.restore(); ctx.globalAlpha = 1;
+    // type block
+    ctx.fillStyle = bg; ctx.fillRect(0, H * 0.7, W, H * 0.3);
+    ctx.fillStyle = fg; ctx.textBaseline = "alphabetic";
+    let size = W * 0.15; ctx.font = `800 ${size}px "Bricolage Grotesque", Arial`;
+    const title = (p ? p.title : "Matej").toUpperCase();
+    while (ctx.measureText(title).width > W - u && size > 20) { size -= 4; ctx.font = `800 ${size}px "Bricolage Grotesque", Arial`; }
+    ctx.fillText(title, u * 0.5, H * 0.7 + size * 0.95);
+    ctx.font = `500 ${W * 0.028}px "DM Mono", monospace`;
+    ctx.fillText((p ? p.tag : "Poster generator").toUpperCase(), u * 0.5, H - u * 1.2);
+    ctx.textAlign = "right"; ctx.fillText(p ? `${p.rank}${p.suit}` : String(seed % 1000), W - u * 0.5, H - u * 1.2);
+    ctx.textAlign = "left";
+    ctx.fillRect(u * 0.5, H * 0.7 - 2, W - u, 4);
+  }
+
+  /* ---------- index ---------- */
+  const list = $("#list"), pop = $("#poster"), popCv = pop.querySelector("canvas");
+  list.innerHTML = D.projects.map((p, i) => `
+    <li class="row rv" data-i="${i}">
+      <a href="${esc(p.url)}" target="_blank" rel="noopener">
+        <span class="n mono">${String(i + 1).padStart(2, "0")}</span>
+        <span class="t">${esc(p.title)}</span>
+        <span class="g mono">${esc(p.tag)}</span>
+        <span class="go" aria-hidden="true">↗</span>
+        <span class="more"><canvas width="600" height="800" aria-hidden="true"></canvas><p>${esc(p.blurb)}</p><span style="color:var(--blue);font-weight:600">Open on GitHub ↗</span></span>
+      </a>
+    </li>`).join("");
+  let px = innerWidth / 2, py = innerHeight / 2, tx = px, ty = py, popOn = false;
+  list.querySelectorAll(".row").forEach((row) => {
+    const i = +row.dataset.i, p = D.projects[i];
+    row.addEventListener("pointerenter", (e) => { if (small() || e.pointerType === "touch") return; poster(popCv, p, hash(p.title)); pop.classList.add("on"); popOn = true; });
+    row.addEventListener("pointerleave", () => { pop.classList.remove("on"); popOn = false; });
+    const a = row.querySelector("a");
+    a.addEventListener("click", (e) => {
+      if (!small()) return;
+      if (!row.classList.contains("open")) { e.preventDefault(); list.querySelectorAll(".row.open").forEach((r) => r.classList.remove("open")); row.classList.add("open"); poster(row.querySelector(".more canvas"), p, hash(p.title)); }
+    });
+  });
+  addEventListener("pointermove", (e) => { tx = e.clientX + 170; ty = e.clientY; });
+  (function follow() { requestAnimationFrame(follow); if (!popOn) return; px += (tx - px) * 0.14; py += (ty - py) * 0.14; pop.style.left = clamp(px, 160, innerWidth - 160) + "px"; pop.style.top = clamp(py, 210, innerHeight - 210) + "px"; })();
+
+  /* ---------- horizontal strip ---------- */
+  const track = $("#track");
+  track.innerHTML = `<div class="panel intro"><span class="k">In short</span><span class="v">Four facts, in poster form.</span><span class="shape"></span></div>`
+    + D.facts.map((f, i) => `<div class="panel"><span class="k">${String(i + 1).padStart(2, "0")} / ${esc(f.k)}</span><span class="v">${esc(f.v)}</span><span class="shape"></span></div>`).join("");
+  const strip = $(".strip");
+  const onScroll = () => {
+    if (small()) return;
+    const r = strip.getBoundingClientRect();
+    const p = clamp(-r.top / (r.height - innerHeight), 0, 1);
+    track.style.transform = `translateX(${-p * (track.scrollWidth - innerWidth)}px)`;
+  };
+  addEventListener("scroll", onScroll, { passive: true }); addEventListener("resize", onScroll); onScroll();
+
+  /* ---------- specimen ---------- */
+  const spec = $("#spec");
+  spec.innerHTML = D.skills.map((s, i) => {
+    const wg = [800, 600, 400, 300, 700, 500, 200, 650][i % 8], wd = [75, 100, 85, 100, 75, 90, 100, 80][i % 8];
+    return `<div class="cellS rv"><span class="w" style="font-weight:${wg};font-variation-settings:'wdth' ${wd},'opsz' 96">${esc(s)}</span><span class="meta mono"><span>${String(i + 1).padStart(2, "0")}</span><span>${wg} / ${wd}</span></span></div>`;
+  }).join("");
+
+  /* ---------- links ---------- */
+  $("#links").innerHTML = D.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener"><span>${esc(l.label)}</span><span>↗</span></a>`).join("");
+
+  /* ---------- reveals ---------- */
+  const io = new IntersectionObserver((ens) => ens.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } }), { threshold: 0.1 });
+  document.querySelectorAll(".rv").forEach((el, i) => { el.style.transitionDelay = (i % 6) * 60 + "ms"; io.observe(el); });
+
+  /* ---------- easter eggs: G grid, P poster generator ---------- */
+  const gen = $("#gen"), genCv = gen.querySelector("canvas");
+  let genSeed = Date.now() % 100000;
+  const regen = () => { genSeed = (genSeed * 7 + 13) % 1000003; poster(genCv, null, genSeed); };
+  gen.addEventListener("click", regen);
+  addEventListener("keydown", (e) => {
+    if (e.target.closest("input, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key.toLowerCase();
+    if (k === "g") $("#gridOverlay").classList.toggle("on");
+    if (k === "p") { gen.classList.toggle("on"); if (gen.classList.contains("on")) regen(); }
+    if (k === " " && gen.classList.contains("on")) { e.preventDefault(); regen(); }
+    if (k === "escape") gen.classList.remove("on");
+  });
+})();
+</script>
+</body>
+</html>
